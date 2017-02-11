@@ -4,7 +4,5 @@
 #PBS -l mem=7gb
 #PBS -S /bin/tcsh
 
-rm -rf /scratch/10/erb/LMR/2ka_ncdc_allproxies_annual_bilinear_mlost_pdsi_multivariable_tas
-mkdir -p /scratch/10/erb/LMR/2ka_ncdc_allproxies_annual_bilinear_mlost_pdsi_multivariable_tas
 cd $PBS_O_WORKDIR
 python LMR_wrapper.py
