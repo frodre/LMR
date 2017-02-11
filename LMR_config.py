@@ -72,7 +72,8 @@ class wrapper(object):
 
     ##** BEGIN User Parameters **##
 
-    multi_seed = None
+    multi_seed = range(0,100)
+    #multi_seed = None
     iter_range = (0, 0)
 
     ##** END User Parameters **##
@@ -121,28 +122,33 @@ class core(object):
 
     ##** BEGIN User Parameters **##
 
-    nexp = 'test'
+    #nexp = 'pages2kv2_test4'
+    nexp = 'testing_github_version'
 
+    lmr_path = '/home/scec-00/lmr/erbm/LMR'
     #lmr_path = '/home/disk/ice4/nobackup/hakim/lmr'
     #lmr_path = '/home/chaos2/wperkins/data/LMR'
-    lmr_path = '/home/disk/kalman3/rtardif/LMR'
+    #lmr_path = '/home/disk/kalman3/rtardif/LMR'
     online_reconstruction = False
     clean_start = True
-    use_precalc_ye = True
+    use_precalc_ye = False
     # TODO: More pythonic to make last time a non-inclusive edge
-    recon_period = (1800, 2000)
+    #recon_period = (1800, 2000)
+    recon_period = (1960, 1960)
     nens = 100
     seed = None
     loc_rad = None
 
+    datadir_output = '/home/scec-00/lmr/erbm/LMR/tmp_output'
     #datadir_output = '/home/disk/ice4/hakim/svnwork/lmr/trunk/data'
     #datadir_output = '/home/chaos2/wperkins/data/LMR/output/working'
-    datadir_output  = '/home/disk/kalman3/rtardif/LMR/output/wrk'
+    #datadir_output  = '/home/disk/kalman3/rtardif/LMR/output/wrk'
     #datadir_output  = '/home/disk/kalman3/rtardif/LMR/output/wrk'
     
+    archive_dir = '/home/scec-00/lmr/erbm/LMR/archive_output'
     #archive_dir = '/home/disk/kalman3/hakim/LMR/'
     #archive_dir = '/home/chaos2/wperkins/data/LMR/output/testing'
-    archive_dir = '/home/disk/kalman3/rtardif/LMR/output'
+    #archive_dir = '/home/disk/kalman3/rtardif/LMR/output'
     #archive_dir = '/home/disk/ekman4/rtardif/LMR/output'
 
     ##** END User Parameters **##
@@ -1067,7 +1073,7 @@ class prior(object):
     # and associated "kind", i.e. as anomalies ('anom') or full field ('full')
     state_variables = {
         'tas_sfc_Amon'              : 'anom',
-        'pr_sfc_Amon'               : 'anom',
+    #    'pr_sfc_Amon'               : 'anom',
     #    'scpdsi_sfc_Amon'           : 'anom',
     #    'psl_sfc_Amon'              : 'anom',
     #    'zg_500hPa_Amon'            : 'full',
