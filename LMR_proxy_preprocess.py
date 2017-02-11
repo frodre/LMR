@@ -53,7 +53,7 @@ def main():
     #proxy_data_source = 'NCDC'
     # version of the NCDC proxy db to process
     #dbversion = 'v0.0.0' 
-    dbversion = 'v0.1.0' 
+    #dbversion = 'v0.1.0' 
 
     eliminate_duplicates = True
 
@@ -89,8 +89,8 @@ def main():
         # PAGES2Kv2 proxy data -------------------------------------------------------
         # ============================================================================
         
-        meta_outfile = outdir + 'Pages2kv2_Metadata.df.pckl'
-        data_outfile = outdir + 'Pages2kv2_Proxies.df.pckl'
+        meta_outfile = outdir + 'NCDC_Pages2kv2_Metadata.df.pckl'
+        data_outfile = outdir + 'NCDC_Pages2kv2_Proxies.df.pckl'
 
         pages2kv2_pickle_to_dataframes(datadir, meta_outfile, data_outfile, eliminate_duplicates)
 
@@ -366,11 +366,11 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
                 
         # Rename some of the the proxy measurements to be more standard.
         if (pages2k_data[counter]['archiveType'] == 'Ice Cores') and (pages2k_data[counter]['paleoData_variableName'] == 'd18O1'):
-            pages2k_data[counter]['paleoData_variableName'] == 'd18O'
-        if (pages2k_data[counter]['archiveType'] == 'Lake Cores') and (pages2k_data[counter]['paleoData_variableName'] == 'temperature1'):
-            pages2k_data[counter]['paleoData_variableName'] == 'temperature'
-        if (pages2k_data[counter]['archiveType'] == 'Lake Cores') and (pages2k_data[counter]['paleoData_variableName'] == 'temperature3'):
-            pages2k_data[counter]['paleoData_variableName'] == 'temperature'
+            pages2k_data[counter]['paleoData_variableName'] = 'd18O'
+        elif (pages2k_data[counter]['archiveType'] == 'Lake Cores') and (pages2k_data[counter]['paleoData_variableName'] == 'temperature1'):
+            pages2k_data[counter]['paleoData_variableName'] = 'temperature'
+        elif (pages2k_data[counter]['archiveType'] == 'Lake Cores') and (pages2k_data[counter]['paleoData_variableName'] == 'temperature3'):
+            pages2k_data[counter]['paleoData_variableName'] = 'temperature'
 
         # Not all records have data for elevation.  In these cases, set elevation to nan.
         if 'geo_meanElev' not in pages2k_data[counter]:
