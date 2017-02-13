@@ -74,7 +74,7 @@ class wrapper(object):
 
     multi_seed = range(0,100)
     #multi_seed = None
-    iter_range = (0, 9)
+    iter_range = (10, 19)
 
     ##** END User Parameters **##
 
