@@ -74,7 +74,7 @@ class wrapper(object):
 
     multi_seed = range(0,100)
     #multi_seed = None
-    iter_range = (10, 19)
+    iter_range = (0, 19)
 
     ##** END User Parameters **##
 
@@ -122,7 +122,7 @@ class core(object):
 
     ##** BEGIN User Parameters **##
 
-    nexp = 'pages2kv2_ccsm4_annual_linear_GISTEMP_2ka'
+    nexp = 'pages2kv2_ccsm4_annual_linear_GISTEMP_2ka_500hPa_heights'
 
     lmr_path = '/home/scec-00/lmr/erbm/LMR'
     #lmr_path = '/home/disk/ice4/nobackup/hakim/lmr'
@@ -130,7 +130,7 @@ class core(object):
     #lmr_path = '/home/disk/kalman3/rtardif/LMR'
     online_reconstruction = False
     clean_start = True
-    use_precalc_ye = False
+    use_precalc_ye = True
     # TODO: More pythonic to make last time a non-inclusive edge
     recon_period = (0, 2000)
     nens = 100
@@ -1106,7 +1106,7 @@ class prior(object):
     #    'pr_sfc_Amon'               : 'anom',
     #    'scpdsi_sfc_Amon'           : 'anom',
     #    'psl_sfc_Amon'              : 'anom',
-    #    'zg_500hPa_Amon'            : 'full',
+        'zg_500hPa_Amon'            : 'full',
     #    'wap_500hPa_Amon'           : 'full',
     #    'AMOCindex_Omon'            : 'anom',
     #    'AMOC26Nmax_Omon'           : 'anom',
