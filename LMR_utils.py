@@ -199,7 +199,7 @@ def ensemble_stats(workdir, y_assim):
                 k = -1
                 for f in files:
                     k = k + 1
-                    i = f.find('year')
+                    i = f.rfind('year')
                     year = f[i+4:i+8]
                     years.append(year)
                     Xatmp = np.load(f)
@@ -238,7 +238,7 @@ def ensemble_stats(workdir, y_assim):
             k = -1
             for f in files:
                 k = k + 1
-                i = f.find('year')
+                i = f.rfind('year')
                 year = f[i+4:i+8]
                 years.append(year)
                 Xatmp = np.load(f)
@@ -282,7 +282,7 @@ def ensemble_stats(workdir, y_assim):
     # Loop over **analysis** files & extract the Ye's
     years = []
     for k, f in enumerate(files):
-        i = f.find('year')
+        i = f.rfind('year')
         year = f[i+4:i+8]
         years.append(float(year))
         Xatmp = np.load(f)

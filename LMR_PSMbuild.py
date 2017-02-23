@@ -271,7 +271,8 @@ class v_proxies(object):
         
         #dbversion = 'v0.0.0'
         #dbversion = 'v0.1.0'
-        dbversion = 'Pages2kv2'  # This uses the Pages2kv2 database, without any NCDC records!
+        #dbversion = 'Pages2kv2'  # This uses the Pages2kv2 database, without any NCDC records!
+        dbversion = 'Pages2kv2_tropicalyear'  # This is like the last one, but averaged on a tropical year (Apr-Mar).
         
         datadir_proxy = None
         datafile_proxy = 'NCDC_%s_Proxies.df.pckl' %(dbversion)
@@ -722,7 +723,8 @@ def main():
         # PSM info
         if calib_avgPeriod == 'annual':
             # override proxy record metadata of seasonality w/ annual tag
-            psm_dict[sitetag]['Seasonality'] = [1,2,3,4,5,6,7,8,9,10,11,12]
+            #psm_dict[sitetag]['Seasonality'] = [1,2,3,4,5,6,7,8,9,10,11,12]
+            psm_dict[sitetag]['Seasonality'] = [4,5,6,7,8,9,10,11,12,13,14,15]
         else:
             psm_dict[sitetag]['Seasonality']  = Y.seasonality
         psm_dict[sitetag]['NbCalPts']     = Y.psm_obj.NbPts

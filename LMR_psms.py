@@ -384,7 +384,8 @@ class LinearPSM(BasePSM):
         # -------------------------------------------------------
         if self.avgPeriod == 'annual':
             # Simply use annual averages
-            avgMonths = [1,2,3,4,5,6,7,8,9,10,11,12]
+            #avgMonths = [1,2,3,4,5,6,7,8,9,10,11,12]
+            avgMonths = [4,5,6,7,8,9,10,11,12,13,14,15]
         elif self.avgPeriod == 'season':
             # Consider the seasonality of the proxy record
             avgMonths =  proxy.seasonality
@@ -1126,6 +1127,7 @@ class BilinearPSM(BasePSM):
         if self.avgPeriod == 'annual':
             # Simply use annual averages
             avgMonths = [1,2,3,4,5,6,7,8,9,10,11,12]
+            avgMonths = [4,5,6,7,8,9,10,11,12,13,14,15]
         elif self.avgPeriod == 'season':
             # Consider the seasonality of the proxy record
             avgMonths =  proxy.seasonality

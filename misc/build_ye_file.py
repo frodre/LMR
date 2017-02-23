@@ -161,11 +161,13 @@ for psm_key in unique_psm_keys:
     if psm_avg == 'annual':
         # calendar year as the only seasonality vector
         season_vects = []
-        season_vects.append([1,2,3,4,5,6,7,8,9,10,11,12])
+        #season_vects.append([1,2,3,4,5,6,7,8,9,10,11,12])
+        season_vects.append([4,5,6,7,8,9,10,11,12,13,14,15])
         season_unique = list(set(map(tuple, season_vects)))
         # assign annual seasonality attribute to all proxy objects
         # (override metadata of the proxy record)
-        for pobj in proxy_objects: pobj.seasonality = [1,2,3,4,5,6,7,8,9,10,11,12]
+        #for pobj in proxy_objects: pobj.seasonality = [1,2,3,4,5,6,7,8,9,10,11,12]
+        for pobj in proxy_objects: pobj.seasonality = [4,5,6,7,8,9,10,11,12,13,14,15]
     elif psm_avg == 'season':
         # map out all possible seasonality vectors that will have to be considered
         season_vects = []

@@ -74,7 +74,7 @@ class wrapper(object):
 
     multi_seed = range(0,100)
     #multi_seed = None
-    iter_range = (0, 19)
+    iter_range = (0, 9)
 
     ##** END User Parameters **##
 
@@ -122,7 +122,8 @@ class core(object):
 
     ##** BEGIN User Parameters **##
 
-    nexp = 'pages2kv2_ccsm4_annual_linear_GISTEMP_2ka_500hPa_heights'
+    #nexp = 'pages2kv2_ccsm4_annual_linear_GISTEMP_2ka_500hPa_heights'
+    nexp = 'pages2kv2_tropicalyear_ccsm4_annual_linear_GISTEMP_2ka'
 
     lmr_path = '/home/scec-00/lmr/erbm/LMR'
     #lmr_path = '/home/disk/ice4/nobackup/hakim/lmr'
@@ -403,7 +404,8 @@ class proxies(object):
 
         #dbversion = 'v0.0.0'
         #dbversion = 'v0.1.0'
-        dbversion = 'Pages2kv2'  # This uses the Pages2kv2 database, without any NCDC records!
+        #dbversion = 'Pages2kv2'  # This uses the Pages2kv2 database, without any NCDC records!
+        dbversion = 'Pages2kv2_tropicalyear'  # This is like the last one, but averaged on a tropical year (Apr-Mar).
         
         datadir_proxy = None
         datafile_proxy = 'NCDC_%s_Proxies.df.pckl' %(dbversion)
@@ -1106,7 +1108,7 @@ class prior(object):
     #    'pr_sfc_Amon'               : 'anom',
     #    'scpdsi_sfc_Amon'           : 'anom',
     #    'psl_sfc_Amon'              : 'anom',
-        'zg_500hPa_Amon'            : 'full',
+    #    'zg_500hPa_Amon'            : 'full',
     #    'wap_500hPa_Amon'           : 'full',
     #    'AMOCindex_Omon'            : 'anom',
     #    'AMOC26Nmax_Omon'           : 'anom',
@@ -1127,7 +1129,8 @@ class prior(object):
     # by default, considers the entire length of the simulation
     detrend = False
 
-    avgInterval = None
+    #avgInterval = None
+    avgInterval = [4,5,6,7,8,9,10,11,12,13,14,15]
     
     ##** END User Parameters **##
 

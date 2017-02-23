@@ -28,10 +28,10 @@ import re
 import six
 import ast
 from os.path import join
+
 import pickle
 import gzip
-import calendar
-   
+
 # =========================================================================================
 
 class EmptyError(Exception):
@@ -54,11 +54,6 @@ def main():
     #dbversion = 'v0.1.0' 
 
     eliminate_duplicates = True
-    
-    # Specify the type of year to use for data averaging.  Currently only affects Pages2k v2 proxies.
-    # "calendar year" (Jan-Dec) or "tropical year" (Apr-Mar)
-    #year_type = "calendar year"
-    year_type = "tropical year"
 
     # datadir: directory where the original proxy datafiles are located
     #datadir = '/home/chaos2/wperkins/data/LMR/proxies/'
@@ -92,14 +87,10 @@ def main():
         # PAGES2Kv2 proxy data -------------------------------------------------------
         # ============================================================================
         
-        if year_type == 'tropical year':
-            meta_outfile = outdir + 'NCDC_Pages2kv2_tropicalyear_Metadata.df.pckl'
-            data_outfile = outdir + 'NCDC_Pages2kv2_tropicalyear_Proxies.df.pckl'
-        else:
-            meta_outfile = outdir + 'NCDC_Pages2kv2_Metadata.df.pckl'
-            data_outfile = outdir + 'NCDC_Pages2kv2_Proxies.df.pckl'
+        meta_outfile = outdir + 'NCDC_Pages2kv2_Metadata.df.pckl'
+        data_outfile = outdir + 'NCDC_Pages2kv2_Proxies.df.pckl'
 
-        pages2kv2_pickle_to_dataframes(datadir, meta_outfile, data_outfile, eliminate_duplicates, year_type)
+        pages2kv2_pickle_to_dataframes(datadir, meta_outfile, data_outfile, eliminate_duplicates)
 
         
     elif  proxy_data_source == 'NCDC':
@@ -232,97 +223,11 @@ def pages_xcel_to_dataframes(filename, metaout, dataout, take_average_out):
     df.to_pickle(dataout)
 
 
-def compute_annual_means(time_raw,data_raw,valid_frac,year_type):
-    """
-    Computes annual-means from raw data.
-    Inputs:
-        time_raw   : Original time axis
-        data_raw   : Original data
-        valid_frac : The fraction of sub-annual data necessary to create annual mean.  Otherwise NaN.
-        year_type  : "calendar year" (Jan-Dec) or "tropical year" (Apr-Mar)
-    Outputs: time_annual, data_annual
-
-    Authors: R. Tardif, Univ. of Washington; M. Erb, Univ. of Southern California
-
-    """
-
-    time_between_records = np.diff(time_raw, n=1)
-
-    # Temporal resolution of the data, calculated as the mode of time difference.
-    time_resolution = abs(stats.mode(time_between_records)[0][0])
-
-    # check if time_resolution = 0.0 !!! sometimes adjacent records are tagged at same time ... 
-    if time_resolution == 0.0:
-        print '***WARNING! Found adjacent records with same times!'
-        inderr = np.where(time_between_records == 0.0)
-        print inderr
-        time_between_records = np.delete(time_between_records,inderr)
-        time_resolution = abs(stats.mode(time_between_records)[0][0])
-
-    max_nb_per_year = int(1.0/time_resolution)
-
-    if time_resolution <=1.0:
-        proxy_resolution = int(1.0)
-    else:
-        proxy_resolution = int(time_resolution)
-
-    # Get the integer values of all years.
-    years_all = [int(time_raw[k]) for k in range(0,len(time_raw))]
-    years = list(set(years_all)) # 'set' is used to get unique values in list
-    years = sorted(years) # sort the list
-    years = np.insert(years,0,years[0]-1) # Add a year prior to the first year because of tropical year adjustments.
-
-    time_annual = np.asarray(years,dtype=np.float64)
-    data_annual = np.zeros(shape=[len(years)], dtype=np.float64)
-    # fill with NaNs for default values
-    data_annual[:] = np.NAN
-        
-    # If some of the time values are floats and year_type is tropical_year,
-    # adjust the years to cover the tropical year (Apr-Mar).
-    if np.equal(np.mod(time_raw,1),0).all() == False and year_type == 'tropical year':
-        print "Tropical year method"
-
-        # Make a variable for the time axis, adjusted to a tropical year
-        time_adjusted = np.zeros(len(time_raw))
-        time_adjusted[:] = np.nan
-
-        for i in range(0,len(time_raw)):
-            year_int = int(time_raw[i])
-            if calendar.isleap(year_int):
-                time_adjusted[i] = time_raw[i]-((31+29+31)/float(366))
-            else:
-                time_adjusted[i] = time_raw[i]-((31+28+31)/float(365))
-                
-        time_raw = time_adjusted
-       
-    # Calculate the mean of all data points with the same year.
-    for i in range(len(years)): 
-        ind = [j for j, k in enumerate(years_all) if k == years[i]]
-        nbdat = len(ind)
-
-        # TODO: check nb of non-NaN values !!!!! ... ... ... ... ... ...
-
-        if time_resolution <= 1.0: 
-            frac = float(nbdat)/float(max_nb_per_year)
-            if frac > valid_frac:
-                data_annual[i] = np.nanmean(data_raw[ind],axis=0)
-        else:
-            if nbdat > 1:
-                print '***WARNING! Found multiple records in same year in data with multiyear resolution!'
-                print '   year=', years[i], nbdat 
-            # Note: this calculates the mean if multiple entries found
-            data_annual[i] = np.nanmean(data_raw[ind],axis=0)
-
-        #print years[i], nbdat, max_nb_per_year, data_annual[i,:]
-
-    return time_annual, data_annual, proxy_resolution
-
-
 # ===================================================================================
-# For PAGES2k v2 proxy data ---------------------------------------------------------
+# For PAGES2k final proxy data ------------------------------------------------------
 # ===================================================================================
 
-def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicates, year_type):
+def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicates):
     """
     Takes in a Pages2k pckl file and converts it to dataframe storage.  
     Authors: R. Tardif, Univ. of Washington, Jan 2016.
@@ -330,7 +235,7 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
     """
 
     # ===============================================================================
-    # Upload proxy data from Pages2k v2 pickle file
+    # Upload proxy data from Pages2k pickle file
     # ===============================================================================
 
     # Open the pickle file containing the Pages2k data
@@ -361,8 +266,6 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
 
     nb = []
     for counter in range(0,len(pages2k_data)):
-        
-        #counter = 13 # An example of a sub-annual record
 
         # Give each record a unique descriptive name
         pages2k_data[counter]['siteID'] = "PAGES2kv2_"+pages2k_data[counter]['dataSetName']+"_"+pages2k_data[counter]['paleoData_pages2kID']+":"+pages2k_data[counter]['paleoData_variableName']
@@ -382,10 +285,62 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
         data_raw = data_raw[~np.isnan(pages2k_data[counter]['year'])]
         
         valid_frac = 0.5
+        time_between_records = np.diff(time_raw, n=1)
+        #print '=>', time_raw
+        #print '=>', time_between_records
 
-        # Use the following function to make annual-means.
-        # Inputs: time_raw, data_raw, valid_frac, year_type.  Outputs: time_annual, data_annual
-        time_annual, data_annual, proxy_resolution = compute_annual_means(time_raw,data_raw,valid_frac,year_type)
+        # Temporal resolution of the data
+        # Use MINIMUM (shortest) time difference ????????????????????????????????????
+        #time_resolution = np.min(abs(time_between_records))
+        # Use MODE of distribution (most frequent time difference) ????????????????????????????????????
+        time_resolution = abs(stats.mode(time_between_records)[0][0])
+
+        # check if time_resolution = 0.0 !!! sometimes adjacent records are tagged at same time ... 
+        if time_resolution == 0.0:
+            print '***WARNING! Found adjacent records with same times!'
+            inderr = np.where(time_between_records == 0.0)
+            print inderr
+            time_between_records = np.delete(time_between_records,inderr)
+            #time_resolution = np.min(abs(time_between_records))
+            time_resolution = abs(stats.mode(time_between_records)[0][0])
+        #print '=>', time_between_records
+        #print '=>', time_resolution
+        max_nb_per_year = int(1.0/time_resolution)
+
+        if  time_resolution <=1.0:
+            proxy_resolution = int(1.0)
+        else:
+            proxy_resolution = int(time_resolution)
+
+        #print time_raw
+        years_all = [int(time_raw[k]) for k in range(0,len(time_raw))]
+        years = list(set(years_all)) # 'set' is used to get unique values in list
+        years = sorted(years) # sort the list
+
+        time_annual = np.asarray(years,dtype=np.float64)
+        data_annual = np.zeros(shape=[len(years)], dtype=np.float64)        
+        # fill with NaNs for default values
+        data_annual[:] = np.NAN
+
+        # Loop over years in dataset
+        for i in range(len(years)): 
+            ind = [j for j, k in enumerate(years_all) if k == years[i]]
+            nbdat = len(ind)
+
+            # TODO: check nb of non-NaN values !!!!! ... ... ... ... ... ...
+
+            if time_resolution <= 1.0: 
+                frac = float(nbdat)/float(max_nb_per_year)
+                if frac > valid_frac:
+                    data_annual[i] = np.nanmean(data_raw[ind],axis=0)
+            else:
+                if nbdat > 1:
+                    print '***WARNING! Found multiple records in same year in data with multiyear resolution!'
+                    print '   year=', years[i], nbdat 
+                # Note: this calculates the mean if multiple entries found
+                data_annual[i] = np.nanmean(data_raw[ind],axis=0)
+
+            #print years[i], nbdat, max_nb_per_year, data_annual[i,:]
 
         # Write the annual data to the dictionary, so they can use written to
         # the data file outside of this loop.
@@ -431,8 +386,7 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
         if any(char.isdigit() for char in season_orig):
             pages2k_data_seasonality = map(int,season_orig.split(' '))
         elif season_orig == 'annual':
-            if year_type == 'tropical year': pages2k_data_seasonality = [4,5,6,7,8,9,10,11,12,13,14,15]
-            else: pages2k_data_seasonality = [1,2,3,4,5,6,7,8,9,10,11,12]
+            pages2k_data_seasonality = [1,2,3,4,5,6,7,8,9,10,11,12]
         elif season_orig == 'summer':
             if pages2k_data[counter]['geo_meanLat'] >= 0: pages2k_data_seasonality = [6,7,8]
             else: pages2k_data_seasonality = [-12,1,2]
@@ -449,8 +403,7 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
             if pages2k_data[counter]['geo_meanLat'] >= 0: pages2k_data_seasonality = [6,7,8]
             else: pages2k_data_seasonality = [-12,1,2]
         else:
-            if year_type == 'tropical year': pages2k_data_seasonality = [4,5,6,7,8,9,10,11,12,13,14,15]
-            else: pages2k_data_seasonality = [1,2,3,4,5,6,7,8,9,10,11,12]
+            pages2k_data_seasonality = [1,2,3,4,5,6,7,8,9,10,11,12]
 
         # Spell out the name of the interpretation variable.
         if pages2k_data[counter]['climateInterpretation_variable'] == 'T':

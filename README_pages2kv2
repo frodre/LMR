@@ -34,6 +34,23 @@ do the following steps.
 5) Follow the steps in README_v2 to run "LMR_PSMbuild.py", "build_ye_file.py", and
    "LMR_wrapper.py" to run your desired experiment.
 
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+Notes for using calendar vs tropical year
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+The LMR code can use either a calendar year (Jan-Dec) or a tropical year (Apr-Mar).
+Before running any code, set the following parameters to make sure that you're using the
+calendar that you want.
+
+File                      Parameter             Value for calendar year        Value for tropical year
+----                      ---------             -----------------------        -----------------------
+LMR_proxy_preprocess.py   year_type             "calendar year"                "tropical year"
+LMR_PSMbuild.py           all instances of...   [1,2,3,4,5,6,7,8,9,10,11,12]   [4,5,6,7,8,9,10,11,12,13,14,15]
+misc/build_ye_file.py     ""                    ""                             ""
+LMR_psms.py               ""                    ""                             ""
+LMR_config.py             avgInterval           None                           [4,5,6,7,8,9,10,11,12,13,14,15]
+
+
 -=-=-=-
 Notes
 -=-=-=-
