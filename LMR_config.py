@@ -123,7 +123,7 @@ class core(object):
     ##** BEGIN User Parameters **##
 
     #nexp = 'pages2kv2_ccsm4_annual_linear_GISTEMP_2ka_500hPa_heights'
-    nexp = 'pages2kv2_tropicalyear_ccsm4_annual_linear_GISTEMP_2ka'
+    nexp = 'pages2kv2_tropicalyear_ccsm4_annual_linear_GISTEMP_2ka_tas'
 
     lmr_path = '/home/scec-00/lmr/erbm/LMR'
     #lmr_path = '/home/disk/ice4/nobackup/hakim/lmr'
