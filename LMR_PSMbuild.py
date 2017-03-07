@@ -67,7 +67,8 @@ class v_core(object):
     #lmr_path = '/home/disk/kalman3/rtardif/LMR'
     lmr_path = '/home/scec-00/lmr/erbm/LMR'
 
-    calib_period = (1850, 2010)
+    #calib_period = (1850, 2010)
+    calib_period = (1916, 1995)
 
     # PSM type to calibrate: 'linear' or 'bilinear'
     psm_type = 'linear'
@@ -470,11 +471,11 @@ class v_psm(object):
         #datatag_calib = 'MLOST'
         #datafile_calib = 'MLOST_air.mon.anom_V3.5.4.nc'
         # or
-        datatag_calib = 'GISTEMP'
-        datafile_calib = 'gistemp1200_ERSST.nc'
+        #datatag_calib = 'GISTEMP'
+        #datafile_calib = 'gistemp1200_ERSST.nc'
         # or
-        #datatag_calib = 'HadCRUT'
-        #datafile_calib = 'HadCRUT.4.4.0.0.median.nc'
+        datatag_calib = 'HadCRUT'
+        datafile_calib = 'HadCRUT.4.4.0.0.median.nc'
         # or 
         #datatag_calib = 'BerkeleyEarth'
         #datafile_calib = 'Land_and_Ocean_LatLong1.nc'
@@ -564,14 +565,14 @@ class v_psm(object):
         # -----------------------------
         # Choice between:
         #
-        datatag_calib_T = 'GISTEMP'
-        datafile_calib_T = 'gistemp1200_ERSST.nc'
+        #datatag_calib_T = 'GISTEMP'
+        #datafile_calib_T = 'gistemp1200_ERSST.nc'
         # or
         #datatag_calib_T = 'MLOST'
         #datafile_calib_T = 'MLOST_air.mon.anom_V3.5.4.nc'
         # or 
-        #datatag_calib_T = 'HadCRUT'
-        #datafile_calib_T = 'HadCRUT.4.4.0.0.median.nc'
+        datatag_calib_T = 'HadCRUT'
+        datafile_calib_T = 'HadCRUT.4.4.0.0.median.nc'
         # or 
         #datatag_calib_T = 'BerkeleyEarth'
         #datafile_calib_T = 'Land_and_Ocean_LatLong1.nc'

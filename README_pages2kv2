@@ -45,10 +45,12 @@ calendar that you want.
 File                      Parameter             Value for calendar year        Value for tropical year
 ----                      ---------             -----------------------        -----------------------
 LMR_proxy_preprocess.py   year_type             "calendar year"                "tropical year"
-LMR_PSMbuild.py           all instances of...   [1,2,3,4,5,6,7,8,9,10,11,12]   [4,5,6,7,8,9,10,11,12,13,14,15]
-misc/build_ye_file.py     ""                    ""                             ""
+misc/build_ye_file.py     all instances of...   [1,2,3,4,5,6,7,8,9,10,11,12]   [4,5,6,7,8,9,10,11,12,13,14,15]
 LMR_psms.py               ""                    ""                             ""
+LMR_PSMbuild.py           ""                    ""                             ""
+""                        dbversion             Pages2kv2                      Pages2kv2_tropicalyear
 LMR_config.py             avgInterval           None                           [4,5,6,7,8,9,10,11,12,13,14,15]
+""                        dbversion             Pages2kv2                      Pages2kv2_tropicalyear
 
 
 -=-=-=-

@@ -18,10 +18,12 @@ from netCDF4 import Dataset, num2date
 # --- Begin section of user-defined parameters ---
 
 # name of directory where the output of LMR experiments are located
-datadir = '/home/disk/ekman4/rtardif/LMR/output'
+datadir = '/home/scec-00/lmr/erbm/LMR/archive_output'
+#datadir = '/home/disk/ekman4/rtardif/LMR/output'
 
 # name of the experiment
-nexp = 't2_2k_CCSM4_LastMillenium_ens100_cGISTEMP_NCDCproxiesPagesTrees_pf0.75'
+nexp = 'pages2kv2_tropicalyear_ccsm4_annual_linear_GISTEMP_2ka_tas'
+#nexp = 't2_2k_CCSM4_LastMillenium_ens100_cGISTEMP_NCDCproxiesPagesTrees_pf0.75'
 #nexp = 'testPslW500Prcp_2c_CCSM4_LM_cGISTEMP_NCDCproxiesPagesTrees_pf0.75'
 
 
@@ -62,7 +64,7 @@ print '\n Getting information on Monte-Carlo realizations...\n'
 
 dirs = glob.glob(expdir+"/r*")
 # sorted
-dirs.sort()
+#dirs.sort()
 # keep names of MC directories (i.r. "r...") only 
 mcdirs = [item.split('/')[-1] for item in dirs]
 # number of MC realizations found
