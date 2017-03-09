@@ -15,7 +15,7 @@ import glob
 datadir = '/home/scec-00/lmr/erbm/LMR/archive_output'
 
 # name of the experiment
-nexp = 'pages2kv2_tropicalyear_ccsm4_annual_linear_GISTEMP_2ka_tas'
+nexp = 'LMR_All_1916_1995'
 
 # --- End section of user-defined parameters ---
 

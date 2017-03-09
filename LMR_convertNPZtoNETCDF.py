@@ -22,7 +22,7 @@ datadir = '/home/scec-00/lmr/erbm/LMR/archive_output'
 #datadir = '/home/disk/ekman4/rtardif/LMR/output'
 
 # name of the experiment
-nexp = 'pages2kv2_tropicalyear_ccsm4_annual_linear_GISTEMP_2ka_tas'
+nexp = 'LMR_All_1916_1995'
 #nexp = 't2_2k_CCSM4_LastMillenium_ens100_cGISTEMP_NCDCproxiesPagesTrees_pf0.75'
 #nexp = 'testPslW500Prcp_2c_CCSM4_LM_cGISTEMP_NCDCproxiesPagesTrees_pf0.75'
 

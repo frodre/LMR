@@ -74,7 +74,8 @@ class wrapper(object):
 
     multi_seed = range(0,100)
     #multi_seed = None
-    iter_range = (0, 9)
+    #iter_range = (10, 19)
+    iter_range = (0, 0)
 
     ##** END User Parameters **##
 
@@ -124,7 +125,8 @@ class core(object):
 
     #nexp = 'pages2kv2_ccsm4_annual_linear_GISTEMP_2ka_500hPa_heights'
     #nexp = 'pages2kv2_tropicalyear_ccsm4_annual_linear_GISTEMP_2ka_tas'
-    nexp = 'LMR_All_1916_1995'
+    #nexp = 'LMR_All_1916_1995'
+    nexp = 'LMR_All_1916_1995_all_ens_test'
 
     lmr_path = '/home/scec-00/lmr/erbm/LMR'
     #lmr_path = '/home/disk/ice4/nobackup/hakim/lmr'
@@ -139,8 +141,8 @@ class core(object):
     seed = None
     loc_rad = None
 
-    datadir_output = '/scratch/10/erb/LMR'
-    #datadir_output = '/home/scec-00/lmr/erbm/LMR/tmp_output'
+    #datadir_output = '/scratch/10/erb/LMR'
+    datadir_output = '/home/scec-00/lmr/erbm/LMR/tmp_output'
     #datadir_output = '/home/disk/ice4/hakim/svnwork/lmr/trunk/data'
     #datadir_output = '/home/chaos2/wperkins/data/LMR/output/working'
     #datadir_output  = '/home/disk/kalman3/rtardif/LMR/output/wrk'
