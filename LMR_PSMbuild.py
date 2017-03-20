@@ -273,7 +273,8 @@ class v_proxies(object):
         #dbversion = 'v0.0.0'
         #dbversion = 'v0.1.0'
         #dbversion = 'Pages2kv2'  # This uses the Pages2kv2 database, without any NCDC records!
-        dbversion = 'Pages2kv2_tropicalyear'  # This is like the last one, but averaged on a tropical year (Apr-Mar).
+        #dbversion = 'Pages2kv2_tropicalyear'  # This is like the last one, but averaged on a tropical year (Apr-Mar).
+        dbversion = 'Pages2kv2_tropicalyear_gaussianized'  # This is like the last one, but uses gaussianized versions of all of the proxy records.
         
         datadir_proxy = None
         datafile_proxy = 'NCDC_%s_Proxies.df.pckl' %(dbversion)
@@ -475,7 +476,8 @@ class v_psm(object):
         #datafile_calib = 'gistemp1200_ERSST.nc'
         # or
         datatag_calib = 'HadCRUT'
-        datafile_calib = 'HadCRUT.4.4.0.0.median.nc'
+        #datafile_calib = 'HadCRUT.4.4.0.0.median.nc'
+        datafile_calib = 'had4_krig_v2_0_0.nc'
         # or 
         #datatag_calib = 'BerkeleyEarth'
         #datafile_calib = 'Land_and_Ocean_LatLong1.nc'
@@ -572,7 +574,8 @@ class v_psm(object):
         #datafile_calib_T = 'MLOST_air.mon.anom_V3.5.4.nc'
         # or 
         datatag_calib_T = 'HadCRUT'
-        datafile_calib_T = 'HadCRUT.4.4.0.0.median.nc'
+        #datafile_calib_T = 'HadCRUT.4.4.0.0.median.nc'
+        datafile_calib_T = 'had4_krig_v2_0_0.nc'
         # or 
         #datatag_calib_T = 'BerkeleyEarth'
         #datafile_calib_T = 'Land_and_Ocean_LatLong1.nc'

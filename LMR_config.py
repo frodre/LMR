@@ -74,8 +74,7 @@ class wrapper(object):
 
     multi_seed = range(0,100)
     #multi_seed = None
-    #iter_range = (10, 19)
-    iter_range = (0, 0)
+    iter_range = (0, 9)
 
     ##** END User Parameters **##
 
@@ -123,10 +122,8 @@ class core(object):
 
     ##** BEGIN User Parameters **##
 
-    #nexp = 'pages2kv2_ccsm4_annual_linear_GISTEMP_2ka_500hPa_heights'
-    #nexp = 'pages2kv2_tropicalyear_ccsm4_annual_linear_GISTEMP_2ka_tas'
-    #nexp = 'LMR_All_1916_1995'
-    nexp = 'LMR_All_1916_1995_all_ens_test'
+    #nexp = 'LMR_All_1916_1995_HadCRUT_krig'
+    nexp = 'LMR_All_1916_1995_HadCRUT_krig_gaussianized_proxies'
 
     lmr_path = '/home/scec-00/lmr/erbm/LMR'
     #lmr_path = '/home/disk/ice4/nobackup/hakim/lmr'
@@ -141,8 +138,8 @@ class core(object):
     seed = None
     loc_rad = None
 
-    #datadir_output = '/scratch/10/erb/LMR'
-    datadir_output = '/home/scec-00/lmr/erbm/LMR/tmp_output'
+    datadir_output = '/scratch/10/erb/LMR'
+    #datadir_output = '/home/scec-00/lmr/erbm/LMR/tmp_output'
     #datadir_output = '/home/disk/ice4/hakim/svnwork/lmr/trunk/data'
     #datadir_output = '/home/chaos2/wperkins/data/LMR/output/working'
     #datadir_output  = '/home/disk/kalman3/rtardif/LMR/output/wrk'
@@ -409,7 +406,8 @@ class proxies(object):
         #dbversion = 'v0.0.0'
         #dbversion = 'v0.1.0'
         #dbversion = 'Pages2kv2'  # This uses the Pages2kv2 database, without any NCDC records!
-        dbversion = 'Pages2kv2_tropicalyear'  # This is like the last one, but averaged on a tropical year (Apr-Mar).
+        #dbversion = 'Pages2kv2_tropicalyear'  # This is like the last one, but averaged on a tropical year (Apr-Mar).
+        dbversion = 'Pages2kv2_tropicalyear_gaussianized'  # This is like the last one, but uses gaussianized versions of all of the proxy records.
         
         datadir_proxy = None
         datafile_proxy = 'NCDC_%s_Proxies.df.pckl' %(dbversion)
@@ -645,14 +643,15 @@ class psm(object):
         #datatag_calib = 'GISTEMP'
         #datafile_calib = 'gistemp1200_ERSST.nc'
         # or
-        # datatag_calib = 'MLOST'
-        # datafile_calib = 'MLOST_air.mon.anom_V3.5.4.nc'
+        #datatag_calib = 'MLOST'
+        #datafile_calib = 'MLOST_air.mon.anom_V3.5.4.nc'
         # or
         datatag_calib = 'HadCRUT'
-        datafile_calib = 'HadCRUT.4.4.0.0.median.nc'
+        #datafile_calib = 'HadCRUT.4.4.0.0.median.nc'
+        datafile_calib = 'had4_krig_v2_0_0.nc'
         # or
-        # datatag_calib = 'BerkeleyEarth'
-        # datafile_calib = 'Land_and_Ocean_LatLong1.nc'
+        #datatag_calib = 'BerkeleyEarth'
+        #datafile_calib = 'Land_and_Ocean_LatLong1.nc'
         # or
         #datatag_calib = 'GPCC'
         #datafile_calib = 'GPCC_precip.mon.flux.1x1.v6.nc'
@@ -761,14 +760,15 @@ class psm(object):
         #datatag_calib_T = 'GISTEMP'
         #datafile_calib_T = 'gistemp1200_ERSST.nc'
         # or
-        # datatag_calib_T = 'MLOST'
-        # datafile_calib_T = 'MLOST_air.mon.anom_V3.5.4.nc'
+        #datatag_calib_T = 'MLOST'
+        #datafile_calib_T = 'MLOST_air.mon.anom_V3.5.4.nc'
         # or
         datatag_calib_T = 'HadCRUT'
-        datafile_calib_T = 'HadCRUT.4.4.0.0.median.nc'
+        #datafile_calib_T = 'HadCRUT.4.4.0.0.median.nc'
+        datafile_calib_T = 'had4_krig_v2_0_0.nc'
         # or
-        # datatag_calib_T = 'BerkeleyEarth'
-        # datafile_calib_T = 'Land_and_Ocean_LatLong1.nc'
+        #datatag_calib_T = 'BerkeleyEarth'
+        #datafile_calib_T = 'Land_and_Ocean_LatLong1.nc'
         #
         # linear PSM w.r.t. precipitation/moisture
         # ----------------------------------------
@@ -896,7 +896,8 @@ class psm(object):
         #datafile_calib_T = 'MLOST_air.mon.anom_V3.5.4.nc'
         # or 
         datatag_calib_T = 'HadCRUT'
-        datafile_calib_T = 'HadCRUT.4.4.0.0.median.nc'
+        #datafile_calib_T = 'HadCRUT.4.4.0.0.median.nc'
+        datafile_calib_T = 'had4_krig_v2_0_0.nc'
         # or 
         #datatag_calib_T = 'BerkeleyEarth'
         #datafile_calib_T = 'Land_and_Ocean_LatLong1.nc'
@@ -1078,8 +1079,8 @@ class prior(object):
     datadir_prior = None
 
     # Prior data directory & model source
-    prior_source = 'ccsm4_last_millenium'
-    datafile_prior = '[vardef_template]_CCSM4_past1000_085001-185012.nc'
+    prior_source     = 'ccsm4_last_millenium'
+    datafile_prior   = '[vardef_template]_CCSM4_past1000_085001-185012.nc'
     # or
     #prior_source     = 'ccsm4_preindustrial_control'
     #datafile_prior   = '[vardef_template]_CCSM4_piControl_080001-130012.nc

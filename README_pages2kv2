@@ -12,6 +12,13 @@ do the following steps.
 1) Retrieve the PAGES2kv2 dataset.  Contact Michael Erb (erbm@usc.edu) if you don't
    already have this.  Put this file in the same directory as your NCDC proxy data file.
 
+   1a) Another change I've made is to use a HadCRUT data set infilled with krigging, so that
+       this dataset is spatially complete.  If you'd like to use this dataset, download the file
+       located here (http://www-users.york.ac.uk/~kdc3/papers/coverage2013/series.html) called
+       had4_krig_v2_0_0.nc.  Add this to your HadCRUT data directory.  If you don't want to use
+       this data set, change the references to this file in LMR_config.py, LMR_PSMbuild.py, and
+       LMR_calibrate.py.
+
 2) In the files LMR_proxy_preprocess.py, LMR_PSMbuild.py, and LMR_config.py, make sure
    the input and output directories point to the appropriate places on your machine.
    You can find the lines you want to change by searching for "erbm" (my username).

@@ -559,14 +559,15 @@ class v_psm(object):
 
         # Choice between:
         # --------------
-        datatag_calib = 'GISTEMP'
-        datafile_calib = 'gistemp1200_ERSST.nc'
+        #datatag_calib = 'GISTEMP'
+        #datafile_calib = 'gistemp1200_ERSST.nc'
         # or
         #datatag_calib = 'MLOST'
         #datafile_calib = 'MLOST_air.mon.anom_V3.5.4.nc'
         # or 
-        #datatag_calib = 'HadCRUT'
+        datatag_calib = 'HadCRUT'
         #datafile_calib = 'HadCRUT.4.4.0.0.median.nc'
+        datafile_calib = 'had4_krig_v2_0_0.nc'
         # or 
         #datatag_calib = 'BerkeleyEarth'
         #datafile_calib = 'Land_and_Ocean_LatLong1.nc'
@@ -665,17 +666,18 @@ class v_psm(object):
         # -----------------------------
         # Choice between:
         # ---------------
-        datatag_calib_T = 'GISTEMP'
-        datafile_calib_T = 'gistemp1200_ERSST.nc'
+        #datatag_calib_T = 'GISTEMP'
+        #datafile_calib_T = 'gistemp1200_ERSST.nc'
         # or
-        # datatag_calib_T = 'MLOST'
-        # datafile_calib_T = 'MLOST_air.mon.anom_V3.5.4.nc'
+        #datatag_calib_T = 'MLOST'
+        #datafile_calib_T = 'MLOST_air.mon.anom_V3.5.4.nc'
         # or
-        # datatag_calib_T = 'HadCRUT'
-        # datafile_calib_T = 'HadCRUT.4.4.0.0.median.nc'
+        datatag_calib_T = 'HadCRUT'
+        #datafile_calib_T = 'HadCRUT.4.4.0.0.median.nc'
+        datafile_calib_T = 'had4_krig_v2_0_0.nc'
         # or
-        # datatag_calib_T = 'BerkeleyEarth'
-        # datafile_calib_T = 'Land_and_Ocean_LatLong1.nc'
+        #datatag_calib_T = 'BerkeleyEarth'
+        #datafile_calib_T = 'Land_and_Ocean_LatLong1.nc'
         #
         # linear PSM w.r.t. precipitation/moisture
         # ----------------------------------------
@@ -790,14 +792,15 @@ class v_psm(object):
         # -----------------------------
         # Choice between:
         #
-        datatag_calib_T = 'GISTEMP'
-        datafile_calib_T = 'gistemp1200_ERSST.nc'
+        #datatag_calib_T = 'GISTEMP'
+        #datafile_calib_T = 'gistemp1200_ERSST.nc'
         # or
         #datatag_calib_T = 'MLOST'
         #datafile_calib_T = 'MLOST_air.mon.anom_V3.5.4.nc'
         # or 
-        #datatag_calib_T = 'HadCRUT'
+        datatag_calib_T = 'HadCRUT'
         #datafile_calib_T = 'HadCRUT.4.4.0.0.median.nc'
+        datafile_calib_T = 'had4_krig_v2_0_0.nc'
         # or 
         #datatag_calib_T = 'BerkeleyEarth'
         #datafile_calib_T = 'Land_and_Ocean_LatLong1.nc'

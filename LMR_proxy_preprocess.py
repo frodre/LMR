@@ -31,6 +31,7 @@ from os.path import join
 import pickle
 import gzip
 import calendar
+import gaussianize
    
 # =========================================================================================
 
@@ -54,6 +55,10 @@ def main():
     #dbversion = 'v0.1.0' 
 
     eliminate_duplicates = True
+
+    # This option transforms all data to a Gaussian distribution.  It should only be used for
+    # regressions, not physically-based PSMs.
+    gaussianize_data = True
     
     # Specify the type of year to use for data averaging.  Currently only affects Pages2k v2 proxies.
     # "calendar year" (Jan-Dec) or "tropical year" (Apr-Mar)
@@ -93,13 +98,21 @@ def main():
         # ============================================================================
         
         if year_type == 'tropical year':
-            meta_outfile = outdir + 'NCDC_Pages2kv2_tropicalyear_Metadata.df.pckl'
-            data_outfile = outdir + 'NCDC_Pages2kv2_tropicalyear_Proxies.df.pckl'
+            if gaussianize_data == True:
+                meta_outfile = outdir + 'NCDC_Pages2kv2_tropicalyear_gaussianized_Metadata.df.pckl'
+                data_outfile = outdir + 'NCDC_Pages2kv2_tropicalyear_gaussianized_Proxies.df.pckl'
+            else:
+                meta_outfile = outdir + 'NCDC_Pages2kv2_tropicalyear_Metadata.df.pckl'
+                data_outfile = outdir + 'NCDC_Pages2kv2_tropicalyear_Proxies.df.pckl'
         else:
-            meta_outfile = outdir + 'NCDC_Pages2kv2_Metadata.df.pckl'
-            data_outfile = outdir + 'NCDC_Pages2kv2_Proxies.df.pckl'
+            if gaussianize_data == True:
+                meta_outfile = outdir + 'NCDC_Pages2kv2_gaussianized_Metadata.df.pckl'
+                data_outfile = outdir + 'NCDC_Pages2kv2_gaussianized_Proxies.df.pckl'
+            else:
+                meta_outfile = outdir + 'NCDC_Pages2kv2_Metadata.df.pckl'
+                data_outfile = outdir + 'NCDC_Pages2kv2_Proxies.df.pckl'
 
-        pages2kv2_pickle_to_dataframes(datadir, meta_outfile, data_outfile, eliminate_duplicates, year_type)
+        pages2kv2_pickle_to_dataframes(datadir, meta_outfile, data_outfile, eliminate_duplicates, year_type, gaussianize_data)
 
         
     elif  proxy_data_source == 'NCDC':
@@ -322,7 +335,7 @@ def compute_annual_means(time_raw,data_raw,valid_frac,year_type):
 # For PAGES2k v2 proxy data ---------------------------------------------------------
 # ===================================================================================
 
-def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicates, year_type):
+def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicates, year_type, gaussianize_data):
     """
     Takes in a Pages2k pckl file and converts it to dataframe storage.  
     Authors: R. Tardif, Univ. of Washington, Jan 2016.
@@ -386,6 +399,11 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
         # Use the following function to make annual-means.
         # Inputs: time_raw, data_raw, valid_frac, year_type.  Outputs: time_annual, data_annual
         time_annual, data_annual, proxy_resolution = compute_annual_means(time_raw,data_raw,valid_frac,year_type)
+
+        # If gaussianize_data is set to true, transform the proxy data to Gaussian.
+        # This option should only be used when using regressions, not physically-based PSMs.
+        if gaussianize_data == True:
+            data_annual = gaussianize.gaussianize(data_annual)
 
         # Write the annual data to the dictionary, so they can use written to
         # the data file outside of this loop.

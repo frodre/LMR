@@ -114,7 +114,7 @@ You must read and understand the version 1 instructions (README) before proceedi
      in configuration)
    - The "avgPeriod" attribute in class "psm"
      (whether to use PSM's calibrated on annual or seasonal averages
-     of calibration data.
+     of calibration data.)
    - The prior source.
 
    Command:
