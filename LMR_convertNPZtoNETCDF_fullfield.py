@@ -22,9 +22,7 @@ datadir = '/home/scec-00/lmr/erbm/LMR/archive_output'
 #datadir = '/home/disk/ekman4/rtardif/LMR/output'
 
 # name of the experiment
-nexp = 'LMR_All_1916_1995'
-#nexp = 't2_2k_CCSM4_LastMillenium_ens100_cGISTEMP_NCDCproxiesPagesTrees_pf0.75'
-#nexp = 'testPslW500Prcp_2c_CCSM4_LM_cGISTEMP_NCDCproxiesPagesTrees_pf0.75'
+nexp = 'LMR_All_1916_1995_all_ens_test'
 
 
 # Dictionary containing definitions of variables that can be handled by this code
@@ -94,11 +92,11 @@ for var in listvars:
     # Loop over realizations
     r = 0
     for dir in mcdirs:
-        fname = expdir+'/'+dir+'/ensemble_mean_'+var+'.npz'
+        fname = expdir+'/'+dir+'/ensemble_'+var+'.npz'
         npzfile = np.load(fname)
 
         # Get the reconstructed field
-        field_values = npzfile['xam']
+        field_values = npzfile['xa_ens']
         
         if r == 0: # first realization
 
@@ -156,22 +154,25 @@ for var in listvars:
         r = r + 1
 
 
-    # Roll array to get dims as [time, niters, nlat, nlon]
+    # Roll array to get dims as [nens, time, niters, nlat, nlon]
     mc_ens_outarr = np.swapaxes(mc_ens,0,1)
+    mc_ens_outarr = np.rollaxis(mc_ens_outarr,4,0)
     
     # Create the netcdf file for the current variable
-    outfile_nc = outdir+'/'+var+'_MCiters_ensemble_mean.nc'
+    outfile_nc = outdir+'/'+var+'_MCiters_fullensemble.nc'
     outfile = Dataset(outfile_nc, 'w', format='NETCDF4')
     outfile.description = 'LMR climate field reconstruction for variable: %s' % var
     outfile.experiment = nexp
-    outfile.comment = 'File contains ensemble-mean values for each Monte-Carlo realization (member)'
+    outfile.comment = 'File contains values for each Monte-Carlo realization (member) and each ensemble member'
     
     # define dimensions
     ntime = years.shape[0]
     nens  = niters
+    nensembles = mc_ens_outarr.shape[0]
 
     outfile.createDimension('time', ntime)
     outfile.createDimension('member', nens)
+    outfile.createDimension('ensemble_member', nensembles)
 
     if field_type == '2D:horizontal':
         nlat  = lat1d.shape[0]
@@ -214,7 +215,12 @@ for var in listvars:
         lon.units = 'degrees_east'
         lon.long_name = 'longitude'
 
-        varout = outfile.createVariable(varname, 'f', ('time','member', 'lat','lon'))        
+        #varout = outfile.createVariable(varname, 'd', ('ensemble_member','time','member', 'lat','lon'))
+        #varout = outfile.createVariable(varname, 'f', ('ensemble_member','time','member', 'lat','lon'))
+        #varout = outfile.createVariable(varname, 'f', ('ensemble_member','time','member', 'lat','lon'),zlib=True)
+        #varout = outfile.createVariable(varname, 'f', ('ensemble_member','time','member', 'lat','lon'),zlib=True,complevel=9)
+        #varout = outfile.createVariable(varname, 'i2', ('ensemble_member','time','member', 'lat','lon'))
+        varout = outfile.createVariable(varname, 'i1', ('ensemble_member','time','member', 'lat','lon'))
         varout.description = var_desc[var][0]
         varout.long_name = var_desc[var][1]
         varout.units = var_desc[var][2]
@@ -239,7 +245,7 @@ for var in listvars:
         lev.units = 'm'
         lev.long_name = 'depth'
 
-        varout = outfile.createVariable(varname, 'f', ('time','member', 'lat','lev'))        
+        varout = outfile.createVariable(varname, 'f', ('ensemble_member','time','member', 'lat','lev'))        
         varout.description = var_desc[var][0]
         varout.long_name = var_desc[var][1]
         varout.units = var_desc[var][2]

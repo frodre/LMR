@@ -68,7 +68,8 @@ class calibration_GISTEMP(calibration_master):
 class calibration_HadCRUT(calibration_master):
 
     source = 'HadCRUT'
-    datafile_calib   = 'HadCRUT.4.3.0.0.median.nc'
+    #datafile_calib   = 'HadCRUT.4.3.0.0.median.nc'
+    datafile_calib   = 'had4_krig_v2_0_0.nc'
     dataformat_calib = 'NCD'
     calib_vars = ['Tsfc']
     outfreq = 'monthly'

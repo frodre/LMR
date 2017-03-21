@@ -64,9 +64,11 @@ class v_core(object):
     
     # lmr_path: where all the data is located ... model (prior), analyses (GISTEMP, HadCRUT...) and proxies.
     #lmr_path = '/home/chaos2/wperkins/data/LMR'
-    lmr_path = '/home/disk/kalman3/rtardif/LMR'
+    #lmr_path = '/home/disk/kalman3/rtardif/LMR'
+    lmr_path = '/home/scec-00/lmr/erbm/LMR'
 
-    calib_period = (1850, 2010)
+    #calib_period = (1850, 2010)
+    calib_period = (1916, 1995)
 
     # PSM type to calibrate: 'linear' or 'bilinear'
     psm_type = 'linear'
@@ -269,7 +271,10 @@ class v_proxies(object):
         ##** BEGIN User Parameters **##
         
         #dbversion = 'v0.0.0'
-        dbversion = 'v0.1.0'
+        #dbversion = 'v0.1.0'
+        #dbversion = 'Pages2kv2'  # This uses the Pages2kv2 database, without any NCDC records!
+        #dbversion = 'Pages2kv2_tropicalyear'  # This is like the last one, but averaged on a tropical year (Apr-Mar).
+        dbversion = 'Pages2kv2_tropicalyear_gaussianized'  # This is like the last one, but uses gaussianized versions of all of the proxy records.
         
         datadir_proxy = None
         datafile_proxy = 'NCDC_%s_Proxies.df.pckl' %(dbversion)
@@ -294,14 +299,17 @@ class v_proxies(object):
 
         # DO NOT CHANGE FORMAT BELOW
         proxy_order = [
-            'Tree Rings_WidthPages',
-            'Tree Rings_WidthPages2',
-            'Tree Rings_WidthBreit',
             'Tree Rings_WoodDensity',
+            'Tree Rings_WidthPages',
+            'Tree Rings_WidthPages2',            
+            'Tree Rings_WidthBreit',
             'Tree Rings_Isotopes',
+            'Tree Rings_Temperature',
             'Corals and Sclerosponges_d18O',
             'Corals and Sclerosponges_SrCa',
             'Corals and Sclerosponges_Rates',
+            'Corals and Sclerosponges_Composite',
+            'Corals and Sclerosponges_Temperature',
             'Ice Cores_d18O',
             'Ice Cores_dD',
             'Ice Cores_Accumulation',
@@ -309,33 +317,47 @@ class v_proxies(object):
             'Lake Cores_Varve',
             'Lake Cores_BioMarkers',
             'Lake Cores_GeoChem',
+            'Lake Cores_Misc',
+            'Lake Cores_Temperature',
             'Marine Cores_d18O',
+            'Marine Cores_Temperature',
+            'Speleothems_d18O',
+            'bivalve_d18O',
+            'borehole_Temperature',
+            'documents_Temperature',
+            'hybrid_Temperature',
             ]
+
 
         proxy_assim2 = {
             'Corals and Sclerosponges_d18O' : ['d18O','delta18O','d18o','d18O_stk','d18O_int','d18O_norm',
                                                'd18o_avg','d18o_ave','dO18','d18O_4'],
             'Corals and Sclerosponges_d14C' : ['d14C','d14c','ac_d14c'],
             'Corals and Sclerosponges_d13C' : ['d13C','d13c','d13c_ave','d13c_ann_ave','d13C_int'],
-            'Corals and Sclerosponges_SrCa' : ['Sr/Ca','Sr/Ca_norm','Sr/Ca_anom','Sr/Ca_int'],
+            'Corals and Sclerosponges_SrCa' : ['Sr/Ca','Sr_Ca','Sr/Ca_norm','Sr/Ca_anom','Sr/Ca_int'],
             'Corals and Sclerosponges_Sr'   : ['Sr'],
             'Corals and Sclerosponges_BaCa' : ['Ba/Ca'],
             'Corals and Sclerosponges_CdCa' : ['Cd/Ca'],
             'Corals and Sclerosponges_MgCa' : ['Mg/Ca'],
             'Corals and Sclerosponges_UCa'  : ['U/Ca','U/Ca_anom'],
             'Corals and Sclerosponges_Pb'   : ['Pb'],
-            'Corals and Sclerosponges_Rates': ['ext','calc'],
+            'Corals and Sclerosponges_Rates': ['ext','calc','calcification'],
+            'Corals and Sclerosponges_Composite': ['composite'],
+            'Corals and Sclerosponges_Temperature': ['temperature'],
             'Ice Cores_d18O'                : ['d18O','delta18O','delta18o','d18o','dO18',
                                                'd18o_int','d18O_int',
                                                'd18O_norm','d18o_norm',
                                                'd18O_anom'],
-            'Ice Cores_dD'                  : ['deltaD','delD'],
+            'Ice Cores_dD'                  : ['deltaD','delD','dD'],
             'Ice Cores_Accumulation'        : ['accum','accumu'],
-            'Ice Cores_MeltFeature'         : ['MFP'],
-            'Lake Cores_Varve'              : ['varve', 'varve_thickness', 'varve thickness'],
+            'Ice Cores_MeltFeature'         : ['MFP','melt'],
+            'Lake Cores_Varve'              : ['varve', 'varve_thickness', 'varve thickness','thickness'],
             'Lake Cores_BioMarkers'         : ['Uk37', 'TEX86'], 
             'Lake Cores_GeoChem'            : ['Sr/Ca', 'Mg/Ca', 'Cl_cont'],
+            'Lake Cores_Misc'               : ['RABD660_670','X_radiograph_dark_layer','massacum'],
+            'Lake Cores_Temperature'        : ['temperature'],
             'Marine Cores_d18O'             : ['d18O'],
+            'Marine Cores_Temperature'      : ['temperature'],
             'Speleothems_d18O'              : ['d18O'],
             'Speleothems_d13C'              : ['d13C'],
             'Tree Rings_WidthBreit'         : ['trsgi_breit'],
@@ -351,7 +373,13 @@ class v_proxies(object):
                                                'density',
                                                'MXD'],
             'Tree Rings_Isotopes'           : ['d18O'],
+            'Tree Rings_Temperature'        : ['temperature'],
+            'bivalve_d18O'                  : ['d18O'],
+            'borehole_Temperature'          : ['temperature'],
+            'documents_Temperature'         : ['temperature'],
+            'hybrid_Temperature'            : ['temperature'],
             }
+
 
 
         def __init__(self):
@@ -444,11 +472,12 @@ class v_psm(object):
         #datatag_calib = 'MLOST'
         #datafile_calib = 'MLOST_air.mon.anom_V3.5.4.nc'
         # or
-        datatag_calib = 'GISTEMP'
-        datafile_calib = 'gistemp1200_ERSST.nc'
+        #datatag_calib = 'GISTEMP'
+        #datafile_calib = 'gistemp1200_ERSST.nc'
         # or
-        #datatag_calib = 'HadCRUT'
+        datatag_calib = 'HadCRUT'
         #datafile_calib = 'HadCRUT.4.4.0.0.median.nc'
+        datafile_calib = 'had4_krig_v2_0_0.nc'
         # or 
         #datatag_calib = 'BerkeleyEarth'
         #datafile_calib = 'Land_and_Ocean_LatLong1.nc'
@@ -538,14 +567,15 @@ class v_psm(object):
         # -----------------------------
         # Choice between:
         #
-        datatag_calib_T = 'GISTEMP'
-        datafile_calib_T = 'gistemp1200_ERSST.nc'
+        #datatag_calib_T = 'GISTEMP'
+        #datafile_calib_T = 'gistemp1200_ERSST.nc'
         # or
         #datatag_calib_T = 'MLOST'
         #datafile_calib_T = 'MLOST_air.mon.anom_V3.5.4.nc'
         # or 
-        #datatag_calib_T = 'HadCRUT'
+        datatag_calib_T = 'HadCRUT'
         #datafile_calib_T = 'HadCRUT.4.4.0.0.median.nc'
+        datafile_calib_T = 'had4_krig_v2_0_0.nc'
         # or 
         #datatag_calib_T = 'BerkeleyEarth'
         #datafile_calib_T = 'Land_and_Ocean_LatLong1.nc'
@@ -697,7 +727,8 @@ def main():
         # PSM info
         if calib_avgPeriod == 'annual':
             # override proxy record metadata of seasonality w/ annual tag
-            psm_dict[sitetag]['Seasonality'] = [1,2,3,4,5,6,7,8,9,10,11,12]
+            #psm_dict[sitetag]['Seasonality'] = [1,2,3,4,5,6,7,8,9,10,11,12]
+            psm_dict[sitetag]['Seasonality'] = [4,5,6,7,8,9,10,11,12,13,14,15]
         else:
             psm_dict[sitetag]['Seasonality']  = Y.seasonality
         psm_dict[sitetag]['NbCalPts']     = Y.psm_obj.NbPts

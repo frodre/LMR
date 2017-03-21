@@ -31,7 +31,9 @@ from os.path import join
 import pickle
 import gzip
 import calendar
-import gaussianize
+
+import code
+
    
 # =========================================================================================
 
@@ -48,23 +50,18 @@ def main():
     # 
 
     #proxy_data_source = 'PAGES2K'
-    proxy_data_source = 'PAGES2Kv2'
-    #proxy_data_source = 'NCDC'
+    proxy_data_source = 'NCDC'
+
     # version of the NCDC proxy db to process
-    #dbversion = 'v0.0.0' 
-    #dbversion = 'v0.1.0' 
+    # For v0.2.0, specify the type of year to use for data averaging.
+    # "calendar year" (Jan-Dec) or "tropical year" (Apr-Mar)
+    #dbversion = 'v0.0.0'
+    #dbversion = 'v0.1.0'
+    dbversion = 'v0.2.0_calendar_year'
+    #dbversion = 'v0.2.0_tropical_year'
 
     eliminate_duplicates = True
-
-    # This option transforms all data to a Gaussian distribution.  It should only be used for
-    # regressions, not physically-based PSMs.
-    gaussianize_data = True
     
-    # Specify the type of year to use for data averaging.  Currently only affects Pages2k v2 proxies.
-    # "calendar year" (Jan-Dec) or "tropical year" (Apr-Mar)
-    #year_type = "calendar year"
-    year_type = "tropical year"
-
     # datadir: directory where the original proxy datafiles are located
     #datadir = '/home/chaos2/wperkins/data/LMR/proxies/'
     #datadir = '/home/disk/kalman3/rtardif/LMR/data/proxies/'
@@ -91,36 +88,14 @@ def main():
         outfile = outdir + 'Pages2k_Proxies.df.pckl'
         pages_xcel_to_dataframes(fname, meta_outfile, outfile, take_average_out)
 
-
-    elif proxy_data_source == 'PAGES2Kv2':
-        # ============================================================================
-        # PAGES2Kv2 proxy data -------------------------------------------------------
-        # ============================================================================
-        
-        if year_type == 'tropical year':
-            if gaussianize_data == True:
-                meta_outfile = outdir + 'NCDC_Pages2kv2_tropicalyear_gaussianized_Metadata.df.pckl'
-                data_outfile = outdir + 'NCDC_Pages2kv2_tropicalyear_gaussianized_Proxies.df.pckl'
-            else:
-                meta_outfile = outdir + 'NCDC_Pages2kv2_tropicalyear_Metadata.df.pckl'
-                data_outfile = outdir + 'NCDC_Pages2kv2_tropicalyear_Proxies.df.pckl'
-        else:
-            if gaussianize_data == True:
-                meta_outfile = outdir + 'NCDC_Pages2kv2_gaussianized_Metadata.df.pckl'
-                data_outfile = outdir + 'NCDC_Pages2kv2_gaussianized_Proxies.df.pckl'
-            else:
-                meta_outfile = outdir + 'NCDC_Pages2kv2_Metadata.df.pckl'
-                data_outfile = outdir + 'NCDC_Pages2kv2_Proxies.df.pckl'
-
-        pages2kv2_pickle_to_dataframes(datadir, meta_outfile, data_outfile, eliminate_duplicates, year_type, gaussianize_data)
-
         
     elif  proxy_data_source == 'NCDC':
         # ============================================================================
         # NCDC proxy data ------------------------------------------------------------
         # ============================================================================
         
-        datadir = datadir+'NCDC/ToPandas_'+dbversion+'/'
+        #datadir = datadir+'NCDC/ToPandas_'+dbversion+'/'
+        datadir = datadir+'NCDC/ToPandas_v0.1.0/'
 
         meta_outfile = outdir + 'NCDC_'+dbversion+'_Metadata.df.pckl'
         data_outfile = outdir + 'NCDC_'+dbversion+'_Proxies.df.pckl'
@@ -158,7 +133,7 @@ def main():
                 #'Climate Reconstructions'         : ['sst_ORSTOM','sss_ORSTOM','temp_anom'],\
             }
 
-        ncdc_txt_to_dataframes(datadir, proxy_def, meta_outfile, data_outfile, eliminate_duplicates)
+        ncdc_txt_to_dataframes(datadir, proxy_def, meta_outfile, data_outfile, eliminate_duplicates, dbversion)
 
     else:
         print 'ERROR: Unkown proxy data source! Exiting!'
@@ -245,14 +220,14 @@ def pages_xcel_to_dataframes(filename, metaout, dataout, take_average_out):
     df.to_pickle(dataout)
 
 
-def compute_annual_means(time_raw,data_raw,valid_frac,year_type):
+def compute_annual_means(time_raw,data_raw,valid_frac,dbversion):
     """
     Computes annual-means from raw data.
     Inputs:
         time_raw   : Original time axis
         data_raw   : Original data
         valid_frac : The fraction of sub-annual data necessary to create annual mean.  Otherwise NaN.
-        year_type  : "calendar year" (Jan-Dec) or "tropical year" (Apr-Mar)
+        dbversion  : "calendar year" (Jan-Dec) or "tropical year" (Apr-Mar)
     Outputs: time_annual, data_annual
 
     Authors: R. Tardif, Univ. of Washington; M. Erb, Univ. of Southern California
@@ -290,9 +265,9 @@ def compute_annual_means(time_raw,data_raw,valid_frac,year_type):
     # fill with NaNs for default values
     data_annual[:] = np.NAN
         
-    # If some of the time values are floats and year_type is tropical_year,
+    # If some of the time values are floats and dbversion is tropical_year,
     # adjust the years to cover the tropical year (Apr-Mar).
-    if np.equal(np.mod(time_raw,1),0).all() == False and year_type == 'tropical year':
+    if np.equal(np.mod(time_raw,1),0).all() == False and 'tropical_year' in dbversion:
         print "Tropical year method"
 
         # Make a variable for the time axis, adjusted to a tropical year
@@ -334,8 +309,7 @@ def compute_annual_means(time_raw,data_raw,valid_frac,year_type):
 # ===================================================================================
 # For PAGES2k v2 proxy data ---------------------------------------------------------
 # ===================================================================================
-
-def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicates, year_type, gaussianize_data):
+def add_pages2kv2_metadata(metadf,df,datadir,dbversion):
     """
     Takes in a Pages2k pckl file and converts it to dataframe storage.  
     Authors: R. Tardif, Univ. of Washington, Jan 2016.
@@ -367,10 +341,10 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
     # Loop over proxy types specified in *main*
     counter = 0
     # Build up pandas DataFrame
-    metadf  = pd.DataFrame()
-    headers = ['NCDC ID','Site name','Lat (N)','Lon (E)','Elev','Archive type','Proxy measurement','Resolution (yr)',\
-               'Oldest (C.E.)','Youngest (C.E.)','Location','climateVariable','Realm','Relation_to_climateVariable',\
-               'Seasonality', 'Databases']
+    #metadf  = pd.DataFrame()
+    #headers = ['NCDC ID','Site name','Lat (N)','Lon (E)','Elev','Archive type','Proxy measurement','Resolution (yr)',\
+    #           'Oldest (C.E.)','Youngest (C.E.)','Location','climateVariable','Realm','Relation_to_climateVariable',\
+    #           'Seasonality', 'Databases']
 
     nb = []
     for counter in range(0,len(pages2k_data)):
@@ -397,13 +371,8 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
         valid_frac = 0.5
 
         # Use the following function to make annual-means.
-        # Inputs: time_raw, data_raw, valid_frac, year_type.  Outputs: time_annual, data_annual
-        time_annual, data_annual, proxy_resolution = compute_annual_means(time_raw,data_raw,valid_frac,year_type)
-
-        # If gaussianize_data is set to true, transform the proxy data to Gaussian.
-        # This option should only be used when using regressions, not physically-based PSMs.
-        if gaussianize_data == True:
-            data_annual = gaussianize.gaussianize(data_annual)
+        # Inputs: time_raw, data_raw, valid_frac, dbversion.  Outputs: time_annual, data_annual
+        time_annual, data_annual, proxy_resolution = compute_annual_means(time_raw,data_raw,valid_frac,dbversion)
 
         # Write the annual data to the dictionary, so they can use written to
         # the data file outside of this loop.
@@ -449,7 +418,7 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
         if any(char.isdigit() for char in season_orig):
             pages2k_data_seasonality = map(int,season_orig.split(' '))
         elif season_orig == 'annual':
-            if year_type == 'tropical year': pages2k_data_seasonality = [4,5,6,7,8,9,10,11,12,13,14,15]
+            if 'tropical_year' in dbversion: pages2k_data_seasonality = [4,5,6,7,8,9,10,11,12,13,14,15]
             else: pages2k_data_seasonality = [1,2,3,4,5,6,7,8,9,10,11,12]
         elif season_orig == 'summer':
             if pages2k_data[counter]['geo_meanLat'] >= 0: pages2k_data_seasonality = [6,7,8]
@@ -467,7 +436,7 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
             if pages2k_data[counter]['geo_meanLat'] >= 0: pages2k_data_seasonality = [6,7,8]
             else: pages2k_data_seasonality = [-12,1,2]
         else:
-            if year_type == 'tropical year': pages2k_data_seasonality = [4,5,6,7,8,9,10,11,12,13,14,15]
+            if 'tropical_year' in dbversion: pages2k_data_seasonality = [4,5,6,7,8,9,10,11,12,13,14,15]
             else: pages2k_data_seasonality = [1,2,3,4,5,6,7,8,9,10,11,12]
 
         # Spell out the name of the interpretation variable.
@@ -496,13 +465,7 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
     print '----------------------------------------------------------------------'
     print ' '
 
-    
-    # Redefine column headers
-    metadf.columns = headers
 
-    # Write metadata to file
-    print 'Now writing metadata to file:', metaout
-    metadf.to_pickle(metaout)
 
     # -----------------------------------------------------
     # Build the proxy **data** DataFrame and output to file
@@ -521,27 +484,11 @@ def pages2kv2_pickle_to_dataframes(datadir, metaout, dataout, eliminate_duplicat
         frame_data[:,0] = pages2k_data[counter]['time_annual']
         frame_data[:,1] = pages2k_data[counter]['data_annual']
 
-        if counter == 0:
-            # Build up pandas DataFrame
-            header = ['NCDC ID', pages2k_data[counter]['siteID']]
-            df = pd.DataFrame({'a':frame_data[:,0], 'b':frame_data[:,1]})
-            df.columns = header
-        else:
-            frame = pd.DataFrame({'NCDC ID':frame_data[:,0], pages2k_data[counter]['siteID']:frame_data[:,1]})
-            df = df.merge(frame, how='outer', on='NCDC ID')
+        frame = pd.DataFrame({'NCDC ID':frame_data[:,0], pages2k_data[counter]['siteID']:frame_data[:,1]})
+        df = df.merge(frame, how='outer', on='NCDC ID')
 
-            
-    # Fix DataFrame index and column name
-    col0 = df.columns[0]
-    df.set_index(col0, drop=True, inplace=True)
-    df.index.name = 'Year C.E.'
-    df.sort_index(inplace=True)
 
-    # Write data to file
-    print 'Now writing to file:', dataout
-    df.to_pickle(dataout)
-    print ' '
-    print 'Done!'
+    return metadf,df
 
 
 # ===================================================================================
@@ -596,7 +543,7 @@ def colonReader(string, fCon, fCon_low, end):
 
 # ===================================================================================
 
-def read_proxy_data_NCDCtxt(site, proxy_def):
+def read_proxy_data_NCDCtxt(site, proxy_def, dbversion):
 #====================================================================================
 # Purpose: Reads data from a selected site (chronology) in NCDC proxy dataset
 # 
@@ -1128,7 +1075,15 @@ def read_proxy_data_NCDCtxt(site, proxy_def):
         # If subannual, average up to annual --------------------------------------------------------
 
         valid_frac = 0.5
-            
+               
+        # Use the following function to make annual-means.
+        # Inputs: time_raw, data_raw, valid_frac, dbversion.  Outputs: time_annual, data_annual
+        time_annual, data_annual, proxy_resolution = compute_annual_means(time_raw,data_raw,valid_frac,dbversion)
+
+        #print "MPE STOP, Stop #1: Take a look around."
+        #code.interact(local=locals())
+
+        """
         time_between_records = np.diff(time_raw, n=1)
         #print '=>', time_raw
         #print '=>', time_between_records
@@ -1184,7 +1139,7 @@ def read_proxy_data_NCDCtxt(site, proxy_def):
                 data_annual[i,:] = np.nanmean(data_raw[ind,:],axis=0)
 
             #print years[i], nbdat, max_nb_per_year, data_annual[i,:]
-
+        """
 
         # proxy identifier and geo location
         id  = d['CollectionName']
@@ -1249,9 +1204,13 @@ def read_proxy_data_NCDCtxt(site, proxy_def):
             #proxy_dict[proxy_name]['Relation_to_temp'] = d['Relation_to_temp']
             #proxy_dict[proxy_name]['Sensitivity']      = d['Sensitivity']
             
+
+            #print "MPE STOP, Stop #2: Take a look around."
+            #code.interact(local=locals())
             
             proxy_dict[proxy_name]['Years']            = time_annual
-            proxy_dict[proxy_name]['Data']             = data_annual[:,k]
+            #proxy_dict[proxy_name]['Data']             = data_annual[:,k]
+            proxy_dict[proxy_name]['Data']             = data_annual
 
             if d['Duplicates']:
                 duplicate_list.extend(d['Duplicates'])
@@ -1267,9 +1226,10 @@ def read_proxy_data_NCDCtxt(site, proxy_def):
 
 # =========================================================================================
 
-def ncdc_txt_to_dataframes(datadir, proxy_def, metaout, dataout, eliminate_duplicates):
+def ncdc_txt_to_dataframes(datadir, proxy_def, metaout, dataout, eliminate_duplicates, dbversion):
     """
-    Takes in NCDC text proxy data and converts it to dataframe storage.  
+    Takes in NCDC text proxy data and converts it to dataframe storage.  After loading the NCDC data,
+    the new Pages2kv2 data is added as well.
 
     Caveat: This increases size on disk due to the joining along the time index (lots of null values).
     But: Makes it easier to query and grab data for the proxy data assimilation experiments.
@@ -1313,7 +1273,7 @@ def ncdc_txt_to_dataframes(datadir, proxy_def, metaout, dataout, eliminate_dupli
     nbsites_valid = 0
     duplicate_list = []
     for file_site in sites_data:
-        proxy_list, duplicate_list = read_proxy_data_NCDCtxt(file_site,proxy_def)
+        proxy_list, duplicate_list = read_proxy_data_NCDCtxt(file_site,proxy_def,dbversion)
         if eliminate_duplicates and duplicate_list:
              master_duplicate_list.extend(duplicate_list)
         if proxy_list: # if returned list is not empty
@@ -1384,31 +1344,36 @@ def ncdc_txt_to_dataframes(datadir, proxy_def, metaout, dataout, eliminate_dupli
         for item in final_proxy_list:
             siteID = item.keys()[0]
             if item[siteID]['Archive'] == proxy_archive and item[siteID]['Measurement'] in proxy_def[key]:
-                nb.append(siteID)
-                # *** for v.0.0.0:
-                #frame  = pd.DataFrame({'a':siteID, 'b':item[siteID]['SiteName'], 'c':item[siteID]['Lat'], 'd':item[siteID]['Lon'], \
-                #                       'e':item[siteID]['Elevation'], 'f':item[siteID]['Archive'], 'g':item[siteID]['Measurement'], \
-                #                       'h':item[siteID]['Resolution (yr)'], 'i':item[siteID]['YearRange'][0], \
-                #                       'j':item[siteID]['YearRange'][1], 'k':item[siteID]['Location'], \
-                #                       'l':item[siteID]['Sensitivity'], 'm':item[siteID]['Relation_to_temp'], 'n':None}, index=[counter])
-                ## To get database *list* into column 'm' of DataFrame
-                #frame.set_value(counter,'n',item[siteID]['Databases'])
-                ## Append to main DataFrame
-                #metadf = metadf.append(frame)
-                # *** for v.0.1.0:
-                frame  = pd.DataFrame({'a':siteID, 'b':item[siteID]['SiteName'], 'c':item[siteID]['Lat'], 'd':item[siteID]['Lon'], \
-                                       'e':item[siteID]['Elevation'], 'f':item[siteID]['Archive'], 'g':item[siteID]['Measurement'], \
-                                       'h':item[siteID]['Resolution (yr)'], 'i':item[siteID]['YearRange'][0], \
-                                       'j':item[siteID]['YearRange'][1], 'k':item[siteID]['Location'], \
-                                       'l':item[siteID]['climateVariable'], 'm':item[siteID]['Realm'], \
-                                       'n':item[siteID]['climateVariableDirec'], 'o':None, 'p':None}, index=[counter])
-                # To get seasonality & databases *lists* into columns 'o' and 'p' of DataFrame
-                frame.set_value(counter,'o',item[siteID]['Seasonality'])
-                frame.set_value(counter,'p',item[siteID]['Databases'])
-                # Append to main DataFrame
-                metadf = metadf.append(frame)
+                #For database version 0.2.0, skip the older PAGES2 records.  The updated PAGES2kv2 records will be added later.
+                #if ('v0.2.0' in dbversion) and ('PAGES2' in item[siteID]['Databases']):
+                #    pass
+                #else:
+                if 1 == 1:
+                    nb.append(siteID)
+                    # *** for v.0.0.0:
+                    #frame  = pd.DataFrame({'a':siteID, 'b':item[siteID]['SiteName'], 'c':item[siteID]['Lat'], 'd':item[siteID]['Lon'], \
+                    #                       'e':item[siteID]['Elevation'], 'f':item[siteID]['Archive'], 'g':item[siteID]['Measurement'], \
+                    #                       'h':item[siteID]['Resolution (yr)'], 'i':item[siteID]['YearRange'][0], \
+                    #                       'j':item[siteID]['YearRange'][1], 'k':item[siteID]['Location'], \
+                    #                       'l':item[siteID]['Sensitivity'], 'm':item[siteID]['Relation_to_temp'], 'n':None}, index=[counter])
+                    ## To get database *list* into column 'm' of DataFrame
+                    #frame.set_value(counter,'n',item[siteID]['Databases'])
+                    ## Append to main DataFrame
+                    #metadf = metadf.append(frame)
+                    # *** for v.0.1.0:
+                    frame  = pd.DataFrame({'a':siteID, 'b':item[siteID]['SiteName'], 'c':item[siteID]['Lat'], 'd':item[siteID]['Lon'], \
+                                           'e':item[siteID]['Elevation'], 'f':item[siteID]['Archive'], 'g':item[siteID]['Measurement'], \
+                                           'h':item[siteID]['Resolution (yr)'], 'i':item[siteID]['YearRange'][0], \
+                                           'j':item[siteID]['YearRange'][1], 'k':item[siteID]['Location'], \
+                                           'l':item[siteID]['climateVariable'], 'm':item[siteID]['Realm'], \
+                                           'n':item[siteID]['climateVariableDirec'], 'o':None, 'p':None}, index=[counter])
+                    # To get seasonality & databases *lists* into columns 'o' and 'p' of DataFrame
+                    frame.set_value(counter,'o',item[siteID]['Seasonality'])
+                    frame.set_value(counter,'p',item[siteID]['Databases'])
+                    # Append to main DataFrame
+                    metadf = metadf.append(frame)
 
-                counter = counter + 1
+                    counter = counter + 1
 
         print '   ', '{:40}'.format(key), ' : ', len(nb)
         tot.append(len(nb))
@@ -1418,14 +1383,8 @@ def ncdc_txt_to_dataframes(datadir, proxy_def, metaout, dataout, eliminate_dupli
     print '----------------------------------------------------------------------'
     print ' '
 
+    # Metdata file gets written at a later step.
     
-    # Redefine column headers
-    metadf.columns = headers
-
-    # Write metadata to file
-    print 'Now writing metadata to file:', metaout
-    metadf.to_pickle(metaout)
-
     # -----------------------------------------------------
     # Build the proxy **data** DataFrame and output to file
     # -----------------------------------------------------
@@ -1457,6 +1416,27 @@ def ncdc_txt_to_dataframes(datadir, proxy_def, metaout, dataout, eliminate_dupli
 
         counter = counter + 1
     
+        
+    # If dbversion is set to one of the "v0.2.0" options, add the Pages2kv2 metadata and data to the dataframes.
+    if 'v0.2.0' in dbversion:
+        metadf,df = add_pages2kv2_metadata(metadf,df,datadir,dbversion)
+    
+    
+    # Eliminate duplicates
+    
+    
+    
+    # FINALIZE THE METADATA AND DATA FILES, THEN WRITE THEM TO FILES.
+    
+    # Redefine column headers
+    metadf.columns = headers
+
+    # Write metadata to file
+    print 'Now writing metadata to file:', metaout
+    #metadf.to_pickle(metaout)
+    metadf.to_pickle('/home/scec-00/lmr/erbm/LMR_github/testing_metadata')
+
+        
     # Fix DataFrame index and column name
     col0 = df.columns[0]
     df.set_index(col0, drop=True, inplace=True)
@@ -1465,7 +1445,8 @@ def ncdc_txt_to_dataframes(datadir, proxy_def, metaout, dataout, eliminate_dupli
 
     # Write data to file
     print 'Now writing to file:', dataout
-    df.to_pickle(dataout)
+    #df.to_pickle(dataout)
+    df.to_pickle('/home/scec-00/lmr/erbm/LMR_github/testing_proxies')
     print ' '
     print 'Done!'
 

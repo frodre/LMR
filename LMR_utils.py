@@ -194,16 +194,18 @@ def ensemble_stats(workdir, y_assim):
 
                 # process the **analysis** files
                 years = []
+                xa_ens = np.zeros([nyears,ndim1,ndim2,nens])
                 xam = np.zeros([nyears,ndim1,ndim2])
                 xav = np.zeros([nyears,ndim1,ndim2],dtype=np.float64)
                 k = -1
                 for f in files:
                     k = k + 1
-                    i = f.find('year')
+                    i = f.rfind('year')
                     year = f[i+4:i+8]
                     years.append(year)
                     Xatmp = np.load(f)
                     Xa = np.reshape(Xatmp[ibeg:iend+1,:],(ndim1,ndim2,nens))
+                    xa_ens[k,:,:,:] = Xa # total ensemble
                     xam[k,:,:] = np.mean(Xa,axis=2) # ensemble mean
                     xav[k,:,:] = np.var(Xa,axis=2,ddof=1)  # ensemble variance
 
@@ -216,6 +218,8 @@ def ensemble_stats(workdir, y_assim):
                 coord1 = np.reshape(Xb_coords[ibeg:iend+1,0],[state_info[var]['spacedims'][0],state_info[var]['spacedims'][1]])
                 coord2 = np.reshape(Xb_coords[ibeg:iend+1,1],[state_info[var]['spacedims'][0],state_info[var]['spacedims'][1]])
 
+                vars_to_save_ens  = {'nens':nens, 'years':years, dimcoord1:state_info[var]['spacedims'][0], dimcoord2:state_info[var]['spacedims'][1], \
+                                         coordname1:coord1, coordname2:coord2, 'xb_ens':Xb, 'xa_ens':xa_ens}
                 vars_to_save_mean = {'nens':nens, 'years':years, dimcoord1:state_info[var]['spacedims'][0], dimcoord2:state_info[var]['spacedims'][1], \
                                          coordname1:coord1, coordname2:coord2, 'xbm':xbm, 'xam':xam}
                 vars_to_save_var  = {'nens':nens, 'years':years, dimcoord1:state_info[var]['spacedims'][0], dimcoord2:state_info[var]['spacedims'][1], \
@@ -238,7 +242,7 @@ def ensemble_stats(workdir, y_assim):
             k = -1
             for f in files:
                 k = k + 1
-                i = f.find('year')
+                i = f.rfind('year')
                 year = f[i+4:i+8]
                 years.append(year)
                 Xatmp = np.load(f)
@@ -252,9 +256,15 @@ def ensemble_stats(workdir, y_assim):
             vars_to_save_var  = {'nens':nens, 'years':years, 'xbv':xbv, 'xav':xav}
 
             # ens to file
-            filen = workdir + '/ensemble_' + var
-            print 'writing the new ensemble file' + filen
-            np.savez(filen, **vars_to_save_ens)
+            #filen = workdir + '/ensemble_' + var
+            #print 'writing the new ensemble file' + filen
+            #np.savez(filen, **vars_to_save_ens)
+
+        # ens to file
+        # UNCOMMENT THE FOLLOWING THREE LINES IF YOU WANT TO SAVE THE FULL FIELD OF A VARIABLE.
+        #filen = workdir + '/ensemble_' + var
+        #print 'writing the new ensemble file' + filen
+        #np.savez(filen, **vars_to_save_ens)
 
         # ens. mean to file
         filen = workdir + '/ensemble_mean_' + var
@@ -282,7 +292,7 @@ def ensemble_stats(workdir, y_assim):
     # Loop over **analysis** files & extract the Ye's
     years = []
     for k, f in enumerate(files):
-        i = f.find('year')
+        i = f.rfind('year')
         year = f[i+4:i+8]
         years.append(float(year))
         Xatmp = np.load(f)

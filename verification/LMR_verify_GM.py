@@ -66,7 +66,7 @@ etime = 2000
 #     MCset = (0,10)   -> the first 11 MC runs (from 0 to 10 inclusively)
 #     MCset = (90,100) -> the 80th to 100th MC runs (21 realizations)
 MCset = None
-MCset = (0,1)
+#MCset = (0,1)
 
 # define the running time mean 
 #nsyrs = 31 # 31-> 31-year running mean--nsyrs must be odd!
@@ -112,20 +112,24 @@ fsave = True
 #nexp = 'test_ncdc_v0.1.0'
 #nexp = 'test_V2proto'
 #nexp = 'test_V2proto_TorP'
-nexp = 'test_final_precalcYeSeason'
+#nexp = 'test_final_precalcYeSeason'
+nexp = 'pages2kv2_ccsm4_annual_linear_GISTEMP_2ka'
 
 # specify directories for LMR data
 #datadir_output = './data/'
 #datadir_output = '/home/disk/kalman3/hakim/LMR'
 #datadir_output = '/home/disk/kalman2/wperkins/LMR_output/archive'
-datadir_output = '/home/disk/kalman3/rtardif/LMR/output'
+#datadir_output = '/home/disk/kalman3/rtardif/LMR/output'
 #datadir_output = '/home/disk/ekman4/rtardif/LMR/output'
+datadir_output = '/home/scec-00/lmr/erbm/LMR/archive_output'
 
 # Directory where historical griddded data products can be found
-datadir_calib = '/home/disk/kalman3/rtardif/LMR/data/analyses'
+#datadir_calib = '/home/disk/kalman3/rtardif/LMR/data/analyses'
+datadir_calib = '/home/scec-00/lmr/erbm/LMR/data/analyses'
 
 # Directory where reanalysis data can be found
-datadir_reanl = '/home/disk/kalman3/rtardif/LMR/data/model'
+#datadir_reanl = '/home/disk/kalman3/rtardif/LMR/data/model'
+datadir_reanl = '/home/scec-00/lmr/erbm/LMR/data/model'
 
 # plotting preferences
 nlevs = 30 # number of contours
