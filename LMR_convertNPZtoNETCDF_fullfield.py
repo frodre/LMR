@@ -215,10 +215,12 @@ for var in listvars:
         lon.units = 'degrees_east'
         lon.long_name = 'longitude'
 
-        varout = outfile.createVariable(varname, 'd', ('ensemble_member','time','member', 'lat','lon'))        
-        #varout = outfile.createVariable(varname, 'f', ('ensemble_member','time','member', 'lat','lon'))        
+        #varout = outfile.createVariable(varname, 'd', ('ensemble_member','time','member', 'lat','lon'))
+        #varout = outfile.createVariable(varname, 'f', ('ensemble_member','time','member', 'lat','lon'))
         #varout = outfile.createVariable(varname, 'f', ('ensemble_member','time','member', 'lat','lon'),zlib=True)
         #varout = outfile.createVariable(varname, 'f', ('ensemble_member','time','member', 'lat','lon'),zlib=True,complevel=9)
+        #varout = outfile.createVariable(varname, 'i2', ('ensemble_member','time','member', 'lat','lon'))
+        varout = outfile.createVariable(varname, 'i1', ('ensemble_member','time','member', 'lat','lon'))
         varout.description = var_desc[var][0]
         varout.long_name = var_desc[var][1]
         varout.units = var_desc[var][2]

@@ -261,9 +261,10 @@ def ensemble_stats(workdir, y_assim):
             #np.savez(filen, **vars_to_save_ens)
 
         # ens to file
-        filen = workdir + '/ensemble_' + var
-        print 'writing the new ensemble file' + filen
-        np.savez(filen, **vars_to_save_ens)
+        # UNCOMMENT THE FOLLOWING THREE LINES IF YOU WANT TO SAVE THE FULL FIELD OF A VARIABLE.
+        #filen = workdir + '/ensemble_' + var
+        #print 'writing the new ensemble file' + filen
+        #np.savez(filen, **vars_to_save_ens)
 
         # ens. mean to file
         filen = workdir + '/ensemble_mean_' + var
