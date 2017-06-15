@@ -42,9 +42,9 @@ You are now ready to run an experiment in the code src directory (where this REA
 
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-To run an experiment, you must edit configuration file LMR_config.py. First copy LMR_config_src.py, which is under version control, to LMR_config.py, which is not. 
+To run an experiment, you must edit configuration file LMR_config.py. First copy LMR_config_template.py, which is under version control, to LMR_config.py, which is not. 
 
-cp LMR_config_src.py LMR_config.py 
+cp LMR_config_template.py LMR_config.py 
 
 Now edit LMR_config.py. At a minimum, do the following.
 
