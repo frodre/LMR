@@ -102,11 +102,13 @@ def main():
 
     # datadir: directory where the original proxy datafiles are located
     #datadir = '/home/chaos2/wperkins/data/LMR/proxies/'
-    datadir = '/home/disk/kalman3/rtardif/LMR/data/proxies/'
+    #datadir = '/home/disk/kalman3/rtardif/LMR/data/proxies/'
+    datadir = '/home/scec-00/lmr/erbm/LMR/data/proxies/'
     
     # outdir: directory where the proxy database files will be created
     #         The piece before /data/proxies should correspond to your "lmr_path" set in LMR_config.py 
-    outdir  = '/home/disk/kalman3/rtardif/LMR/data/proxies/'
+    #outdir  = '/home/disk/kalman3/rtardif/LMR/data/proxies/'
+    outdir  = '/home/scec-00/lmr/erbm/LMR/data/proxies/'
 
     # 
     # Section for User-defined options: end

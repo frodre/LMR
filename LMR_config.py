@@ -205,9 +205,10 @@ class core(ConfigGroup):
 
     nexp = 'test'
 
+    lmr_path = '/home/scec-00/lmr/erbm/LMR'
     #lmr_path = '/home/disk/ice4/nobackup/hakim/lmr'
     #lmr_path = '/home/chaos2/wperkins/data/LMR'
-    lmr_path = '/home/disk/kalman3/rtardif/LMR'
+    #lmr_path = '/home/disk/kalman3/rtardif/LMR'
 
     online_reconstruction = False
     clean_start = True
@@ -230,14 +231,17 @@ class core(ConfigGroup):
 
     loc_rad = None
 
+    #datadir_output = '/scratch/10/erb/LMR'
+    datadir_output = '/home/scec-00/lmr/erbm/LMR/tmp_output'
     #datadir_output = '/home/disk/ice4/hakim/svnwork/lmr/trunk/data'
     #datadir_output = '/home/chaos2/wperkins/data/LMR/output/working'
-    datadir_output  = '/home/disk/kalman3/rtardif/LMR/output/wrk'
+    #datadir_output  = '/home/disk/kalman3/rtardif/LMR/output/wrk'
     #datadir_output  = '/home/disk/kalman3/rtardif/LMR/output/wrk'
     
+    archive_dir = '/home/scec-00/lmr/erbm/LMR/archive_output'
     #archive_dir = '/home/disk/kalman3/hakim/LMR/'
     #archive_dir = '/home/chaos2/wperkins/data/LMR/output/testing'
-    archive_dir = '/home/disk/kalman3/rtardif/LMR/output'
+    #archive_dir = '/home/disk/kalman3/rtardif/LMR/output'
     #archive_dir = '/home/disk/ekman4/rtardif/LMR/output'
 
     ##** END User Parameters **##
