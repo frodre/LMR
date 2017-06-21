@@ -1,18 +1,12 @@
 """
 Class based config module to help with passing information to LMR modules for
 paleoclimate reconstruction experiments.
-
 NOTE:  All general user parameters that should be edited are displayed
        between the following sections:
-
        ##** BEGIN User Parameters **##
-
        parameters, etc.
-
        ##** END User Parameters **##
-
 Adapted from LMR_exp_NAMELIST by AndreP
-
 Revisions:
  - Introduction of definitions related to use of newly developed NCDC proxy
    database.
@@ -125,7 +119,6 @@ class constants:
 class wrapper(ConfigGroup):
     """
     Parameters for reconstruction realization manager LMR_wrapper.
-
     Attributes
     ----------
     multi_seed: list(int), None
@@ -136,7 +129,6 @@ class wrapper(ConfigGroup):
     param_search: dict{str: Iterable} or None
         Names of configuration parameters to iterate over when performing a
         reconstruction experiment
-
     Example
     -------
     The param_search dictionary should use the configuration object attribute
@@ -166,11 +158,9 @@ class wrapper(ConfigGroup):
 class core(ConfigGroup):
     """
     High-level parameters of LMR_driver_callable.
-
     Notes
     -----
     curr_iter attribute is created during initialization
-
     Attributes
     ----------
     nexp: str
@@ -268,7 +258,6 @@ class core(ConfigGroup):
 class proxies(ConfigGroup):
     """
     Parameters for proxy data
-
     Attributes
     ----------
     use_from: list(str)
@@ -333,12 +322,10 @@ class proxies(ConfigGroup):
     class pages(ConfigGroup):
         """
         Parameters for PagesProxy class
-
         Notes
         -----
         proxy_type_mappings and simple_filters are creating during instance
         creation.
-
         Attributes
         ----------
         datadir_proxy: str
@@ -494,12 +481,10 @@ class proxies(ConfigGroup):
     class ncdc(ConfigGroup):
         """
         Parameters for NCDC proxy class
-
         Notes
         -----
         proxy_type_mappings and simple_filters are creating during instance
         creation.
-
         Attributes
         ----------
         datadir_proxy: str
@@ -711,12 +696,10 @@ class proxies(ConfigGroup):
     class ncdcdtda(ConfigGroup):
         """
         Parameters for NCDCdtda proxy class
-
         Notes
         -----
         proxy_type_mappings and simple_filters are creating during instance
         creation.
-
         Attributes
         ----------
         datadir_proxy: str
@@ -865,7 +848,6 @@ class proxies(ConfigGroup):
 class psm(ConfigGroup):
     """
     Parameters for PSM classes
-
     Attributes
     ----------
     avgPeriod: str
@@ -893,7 +875,6 @@ class psm(ConfigGroup):
     class linear(ConfigGroup):
         """
         Parameters for the linear fit PSM.
-
         Attributes
         ----------
         datatag_calib: str
@@ -1006,7 +987,6 @@ class psm(ConfigGroup):
         """
         Parameters for the linear fit PSM, calibrated against 
         temperature OR moisture.
-
         Attributes
         ----------
         datatag_calib_T: str
@@ -1157,7 +1137,6 @@ class psm(ConfigGroup):
     class bilinear(ConfigGroup):
         """
         Parameters for the bilinear fit PSM.
-
         Attributes
         ----------
         datatag_calib_T: str
@@ -1284,7 +1263,6 @@ class psm(ConfigGroup):
     class h_interp(ConfigGroup):
         """
         Parameters for the horizontal interpolator PSM.
-
         Attributes
         ----------
         radius_influence : real
@@ -1353,7 +1331,6 @@ class psm(ConfigGroup):
     class bayesreg_uk37(ConfigGroup):
         """
         Parameters for the Bayesian regression PSM for uk37 proxies.
-
         Attributes
         ----------
         radius_influence : real
@@ -1427,7 +1404,6 @@ class psm(ConfigGroup):
 class prior(ConfigGroup):
     """
     Parameters for the ensemble DA prior
-
     Attributes
     ----------
     prior_source: str
@@ -1615,7 +1591,6 @@ class Config(ConfigGroup):
 def is_config_class(obj):
     """
     Tests whether the input object is an instance of ConfigGroup
-
     Parameters
     ----------
     obj: object
@@ -1635,28 +1610,23 @@ def update_config_class_yaml(yaml_dict, cfg_module):
     Updates a configuration object using a dictionary (typically from a yaml
     file) that follows the naming convention and nesting of these
     configuration classes.
-
     Parameters
     ----------
     yaml_dict: dict
         The dictionary of values to update in the current configuration input
     cfg_module: ConfigGroup like
         The configuration object to be updated by yaml_dict
-
     Returns
     -------
     dict
         Returns a dictionary of all unused parameters from the update process
-
     Examples
     --------
     If cfg_module is an imported LMR_config as cfg then the following
     dictionary could be used to update a core and linear psm attribute.
     yaml_dict = {'core': {'lmr_path': '/new/path/to/LMR_files'},
                  'psm': {'linear': {'datatag_calib': 'GISTEMP'}}}
-
     These are the types of dictionaries that result from a yaml.load function.
-
     Warnings
     --------
     This function is meant to be run on imported configuration classes not
@@ -1686,4 +1656,4 @@ def update_config_class_yaml(yaml_dict, cfg_module):
 if __name__ == "__main__":
     kwargs = {'wrapper': {'multi_seed': [1, 2, 3]}, 'psm': {'linear': {'datatag_calib': 'BE'}}}
     tmp = Config(**kwargs)
-    pass
+pass

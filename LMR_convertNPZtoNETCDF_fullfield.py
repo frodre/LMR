@@ -1,16 +1,15 @@
 """
-Module: LMR_convertNPZtoNETCDF.py
+Module: LMR_convertNPZtoNETCDF_fullfield.py
 
-Purpose: Converts LMR output from .npz files to netcdf files. 
-         Now restricted to ensemble-mean and variance reconstruction variables,
-         for every Monte-Carlo realization included in the experiment.
+Purpose: Converts LMR output from .npz files to netcdf files for every
+         Monte-Carlo realization included in the experiment.  Monte-Carlo
+         realizations are saved as seperate files to avoid memory errors.
 
 Originator: Robert Tardif | Univ. of Washington, Dept. of Atmospheric Sciences
-                          | April 2016
-Modified by: Michael Erb  | University of Southern California
+            Michael Erb   | University of Southern California
+                          | June 2017
 
-Revisions: 4/21/2017 - The file has been modified to make variance files in
-                       addition to the mean files.
+Revisions: None
 
 """
 import glob
@@ -24,8 +23,6 @@ datadir = '/home/scec-00/lmr/erbm/LMR/archive_output'
 #datadir = '/home/disk/ekman4/rtardif/LMR/output'
 
 # name of the experiment
-#nexp = 't2_2k_CCSM4_LastMillenium_ens100_cGISTEMP_NCDCproxiesPagesTrees_pf0.75'
-#nexp = 'testPslW500Prcp_2c_CCSM4_LM_cGISTEMP_NCDCproxiesPagesTrees_pf0.75'
 nexp = 'test_pages2kv2_fullfield'
 
 
@@ -66,7 +63,7 @@ print '\n Getting information on Monte-Carlo realizations...\n'
 
 dirs = glob.glob(expdir+"/r*")
 # sorted
-# dirs.sort()   This line appears to actually put the directories out of order.  Instead of r0,r1,r2,r3..., it goes r0,r1,r10,r11...
+#dirs.sort()
 # keep names of MC directories (i.r. "r...") only 
 mcdirs = [item.split('/')[-1] for item in dirs]
 # number of MC realizations found
@@ -79,108 +76,91 @@ print '\n Getting information on reconstructed variables...\n'
 
 # look in first "mcdirs" only. It should be the same for all. 
 workdir = expdir+'/'+mcdirs[0]
-# look for "ensemble_mean" files
-listdirfiles = glob.glob(workdir+"/ensemble_mean_*")
+# look for "ensemble_full" files
+listdirfiles = glob.glob(workdir+"/ensemble_full_*")
 
 # strip directory name, keep file name only
 listfiles = [item.split('/')[-1] for item in listdirfiles]
 
 # strip everything but variable name
-listvars = [(item.replace('ensemble_mean_','')).replace('.npz','') for item in listfiles]
+listvars = [(item.replace('ensemble_full_','')).replace('.npz','') for item in listfiles]
 
 print 'Variables:', listvars, '\n'
 
-# Loop of mean and variance:
-datatypes = ['mean','variance']
+# Loop over variables
+for var in listvars:
+    print '\n Variable:', var
+    # Loop over realizations
+    for dir in mcdirs:
+        fname = expdir+'/'+dir+'/ensemble_full_'+var+'.npz'
+        npzfile = np.load(fname)
 
-for datatype in datatypes:
-    print '\n Data type:', datatype
-
-    # Loop over variables
-    for var in listvars:
-        print '\n Variable:', var
-        # Loop over realizations
-        r = 0
-        for dir in mcdirs:
-            fname = expdir+'/'+dir+'/ensemble_'+datatype+'_'+var+'.npz'
-            npzfile = np.load(fname)
-
-            # Get the reconstructed field
-            if datatype == 'mean': field_values = npzfile['xam']
-            elif datatype == 'variance': field_values = npzfile['xav']
+        # Get the reconstructed field
+        field_values = npzfile['xa_ens']
+        
+        npzcontent = npzfile.files
+        print '  file contents:', npzcontent
             
-            if r == 0: # first realization
+        # get the years in the reconstruction ... for some reason stored in an array of strings ...
+        years_str =  npzfile['years']
+        # convert to array of floats
+        years = np.asarray([float(item) for item in years_str])
 
-                npzcontent = npzfile.files
-                print '  file contents:', npzcontent
-                
-                # get the years in the reconstruction ... for some reason stored in an array of strings ...
-                years_str =  npzfile['years']
-                # convert to array of floats
-                years = np.asarray([float(item) for item in years_str])
+        # Determine type of variation, get spatial coordinates if present
+        if 'lat' in npzcontent and 'lon' in npzcontent:
+            field_type = '2D:horizontal'
+            print '  field type:', field_type
+            # get lat/lon data
+            lat2d = npzfile['lat']
+            lon2d = npzfile['lon']
+            #print '  ', lat2d.shape, lon2d.shape
+            lat1d = lat2d[:,0]
+            lon1d = lon2d[0,:]
+            print '  nlat/nlon=', lat1d.shape, lon1d.shape
 
-                # Determine type of variation, get spatial coordinates if present
-                if 'lat' in npzcontent and 'lon' in npzcontent:
-                    field_type = '2D:horizontal'
-                    print '  field type:', field_type
-                    # get lat/lon data
-                    lat2d = npzfile['lat']
-                    lon2d = npzfile['lon']
-                    #print '  ', lat2d.shape, lon2d.shape
-                    lat1d = lat2d[:,0]
-                    lon1d = lon2d[0,:]
-                    print '  nlat/nlon=', lat1d.shape, lon1d.shape
+        elif 'lat' in npzcontent and 'lev' in npzcontent:
+            field_type = '2D:meridional_vertical'
+            print '  field type:', field_type
+            # get lat/lev data
+            lat2d = npzfile['lat']
+            lev2d = npzfile['lev']
+            #print '  ', lat2d.shape, lev2d.shape
+            lat1d = lat2d[:,0]
+            lev1d = lev2d[0,:]
+            print '  nlat/nlev=', lat1d.shape, lev1d.shape
+             
+        elif 'lat' not in npzcontent and 'lon' not in npzcontent and 'lev' not in npzcontent:
+            # no spatial coordinate, must be a scalar (time series)
+            field_type='1D:time_series'
+            print '  field type:', field_type
+        else:
+            print 'Cannot handle this variable yet! Variable of unrecognized dimensions... Exiting!'
+            exit(1)
 
-                elif 'lat' in npzcontent and 'lev' in npzcontent:
-                    field_type = '2D:meridional_vertical'
-                    print '  field type:', field_type
-                    # get lat/lev data
-                    lat2d = npzfile['lat']
-                    lev2d = npzfile['lev']
-                    #print '  ', lat2d.shape, lev2d.shape
-                    lat1d = lat2d[:,0]
-                    lev1d = lev2d[0,:]
-                    print '  nlat/nlev=', lat1d.shape, lev1d.shape
-                     
-                elif 'lat' not in npzcontent and 'lon' not in npzcontent and 'lev' not in npzcontent:
-                    # no spatial coordinate, must be a scalar (time series)
-                    field_type='1D:time_series'
-                    print '  field type:', field_type
-                else:
-                    print 'Cannot handle this variable yet! Variable of unrecognized dimensions... Exiting!'
-                    exit(1)
-
-                
-                # declare master array that will contain data from all the M-C realizations 
-                # (i.e. the "Monte-Carlo ensemble")
-                dims = field_values.shape
-                print '  xam or xav field dimensions', dims
-                tmp = np.expand_dims(field_values, axis=0)
-                # Form the array with the right total dimensions
-                mc_ens = np.repeat(tmp,niters,axis=0)
-                
-            else:
-                mc_ens[r,:] = field_values
-                
-            r = r + 1
+        
+        # declare master array that will contain data from all the M-C realizations 
+        # (i.e. the "Monte-Carlo ensemble")
+        dims = field_values.shape
+        print '  xam field dimensions', dims
+        mc_ens = field_values
 
 
-        # Roll array to get dims as [time, niters, nlat, nlon]
-        mc_ens_outarr = np.swapaxes(mc_ens,0,1)
+        # Roll array to get dims as [nens, time, nlat, nlon]
+        mc_ens_outarr = np.rollaxis(mc_ens,-1,0)
         
         # Create the netcdf file for the current variable
-        outfile_nc = outdir+'/'+var+'_MCiters_ensemble_'+datatype+'.nc'
+        outfile_nc = outdir+'/'+var+'_MCiters_ensemble_full_'+dir+'.nc'
         outfile = Dataset(outfile_nc, 'w', format='NETCDF4')
         outfile.description = 'LMR climate field reconstruction for variable: %s' % var
         outfile.experiment = nexp
-        outfile.comment = 'File contains ensemble-'+datatype+' values for each Monte-Carlo realization (member)'
+        outfile.comment = 'File contains values for each ensemble member for Monte-Carlo realization '+dir
         
         # define dimensions
         ntime = years.shape[0]
-        nens  = niters
+        nensembles = mc_ens_outarr.shape[0]
 
         outfile.createDimension('time', ntime)
-        outfile.createDimension('member', nens)
+        outfile.createDimension('ensemble_member', nensembles)
 
         if field_type == '2D:horizontal':
             nlat  = lat1d.shape[0]
@@ -223,7 +203,11 @@ for datatype in datatypes:
             lon.units = 'degrees_east'
             lon.long_name = 'longitude'
 
-            varout = outfile.createVariable(varname, 'f', ('time','member', 'lat','lon'))
+            #varout = outfile.createVariable(varname, 'f', ('ensemble_member','time', 'lat','lon'))
+            varout = outfile.createVariable(varname, 'f', ('ensemble_member','time', 'lat','lon'),zlib=True,complevel=4)
+            #varout = outfile.createVariable(varname, 'f', ('ensemble_member','time', 'lat','lon'),zlib=True,complevel=9)
+            #varout = outfile.createVariable(varname, 'i2', ('ensemble_member','time', 'lat','lon'))   # NOT WORKING CORRECTLY
+            #varout = outfile.createVariable(varname, 'i1', ('ensemble_member','time', 'lat','lon'))   # NOT WORKING CORRECTLY
             varout.description = var_desc[var][0]
             varout.long_name = var_desc[var][1]
             varout.units = var_desc[var][2]
@@ -248,7 +232,7 @@ for datatype in datatypes:
             lev.units = 'm'
             lev.long_name = 'depth'
 
-            varout = outfile.createVariable(varname, 'f', ('time','member', 'lat','lev'))        
+            varout = outfile.createVariable(varname, 'f', ('ensemble_member','time', 'lat','lev'))        
             varout.description = var_desc[var][0]
             varout.long_name = var_desc[var][1]
             varout.units = var_desc[var][2]
@@ -260,7 +244,7 @@ for datatype in datatypes:
             varout[:] = mc_ens_outarr
 
         elif field_type == '1D:time_series':
-            varout = outfile.createVariable(varname, 'f', ('time','member'))        
+            varout = outfile.createVariable(varname, 'f', ('ensemble_member','time'))        
             varout.description = var_desc[var][0]
             varout.long_name = var_desc[var][1]
             varout.units = var_desc[var][2]

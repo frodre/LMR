@@ -90,8 +90,8 @@ def main():
     gaussianize_data = False
     
     # Specify the type of year to use for data averaging. "calendar year" (Jan-Dec) or "tropical year" (Apr-Mar)
-    year_type = "calendar year"
-    #year_type = "tropical year"
+    #year_type = "calendar year"
+    year_type = "tropical year"
     
     # ---
     #proxy_data_source = 'DTDA'
