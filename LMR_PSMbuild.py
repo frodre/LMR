@@ -95,8 +95,7 @@ class v_core(object):
     
     # lmr_path: where all the data is located ... model (prior), analyses (GISTEMP, HadCRUT...) and proxies.
     #lmr_path = '/home/chaos2/wperkins/data/LMR'
-    #lmr_path = '/home/disk/kalman3/rtardif/LMR'
-    lmr_path = '/home/scec-00/lmr/erbm/LMR'
+    lmr_path = '/home/disk/kalman3/rtardif/LMR'
 
     calib_period = (1850, 2015)
 
@@ -609,8 +608,8 @@ class v_psm(object):
     load_precalib = False
     
     # PSM calibrated on annual or seasonal data: allowed tags are 'annual' or 'season'
-    avgPeriod = 'annual'
-    #avgPeriod = 'season'
+    #avgPeriod = 'annual'
+    avgPeriod = 'season'
 
     # Boolean flag indicating whether PSMs are to be calibrated using objectively-derived
     # proxy seasonality instead of using the "seasonality" metadata included in the data
@@ -654,11 +653,11 @@ class v_psm(object):
         ##** BEGIN User Parameters **##
         
         # Choice between:
-        datatag_calib = 'MLOST'
-        datafile_calib = 'MLOST_air.mon.anom_V3.5.4.nc'
+        #datatag_calib = 'MLOST'
+        #datafile_calib = 'MLOST_air.mon.anom_V3.5.4.nc'
         # or
-        #datatag_calib = 'GISTEMP'
-        #datafile_calib = 'gistemp1200_ERSSTv4.nc'
+        datatag_calib = 'GISTEMP'
+        datafile_calib = 'gistemp1200_ERSSTv4.nc'
         # or
         #datatag_calib = 'HadCRUT'
         #datafile_calib = 'HadCRUT.4.4.0.0.median.nc'

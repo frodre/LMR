@@ -7,7 +7,6 @@ from itertools import izip
 import timeit
 
 sys.path.append('../')
-sys.path.append('/home/scec-00/lmr/erbm/LMR_github/LMR/')
 
 import LMR_prior
 import LMR_proxy_pandas_rework

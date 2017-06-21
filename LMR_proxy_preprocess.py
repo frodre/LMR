@@ -90,8 +90,8 @@ def main():
     gaussianize_data = False
     
     # Specify the type of year to use for data averaging. "calendar year" (Jan-Dec) or "tropical year" (Apr-Mar)
-    #year_type = "calendar year"
-    year_type = "tropical year"
+    year_type = "calendar year"
+    #year_type = "tropical year"
     
     # ---
     #proxy_data_source = 'DTDA'
@@ -102,13 +102,11 @@ def main():
 
     # datadir: directory where the original proxy datafiles are located
     #datadir = '/home/chaos2/wperkins/data/LMR/proxies/'
-    #datadir = '/home/disk/kalman3/rtardif/LMR/data/proxies/'
-    datadir = '/home/scec-00/lmr/erbm/LMR/data/proxies/'
+    datadir = '/home/disk/kalman3/rtardif/LMR/data/proxies/'
     
     # outdir: directory where the proxy database files will be created
     #         The piece before /data/proxies should correspond to your "lmr_path" set in LMR_config.py 
-    #outdir  = '/home/disk/kalman3/rtardif/LMR/data/proxies/'
-    outdir  = '/home/scec-00/lmr/erbm/LMR/data/proxies/'
+    outdir  = '/home/disk/kalman3/rtardif/LMR/data/proxies/'
 
     # 
     # Section for User-defined options: end
