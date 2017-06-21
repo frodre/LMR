@@ -29,7 +29,7 @@ from LMR_utils import validate_config, ensemble_stats
 import LMR_utils as Utils
 
 # To save the full field, set this to True.
-save_full_field = True
+save_full_field = False
 
 print '\n' + str(datetime.datetime.now()) + '\n'
 
