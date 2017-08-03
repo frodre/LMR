@@ -28,9 +28,6 @@ import LMR_config
 from LMR_utils import validate_config, ensemble_stats
 import LMR_utils as Utils
 
-# To save the full field, set this to True.
-save_full_field = False
-
 print '\n' + str(datetime.datetime.now()) + '\n'
 
 if not LMR_config.LEGACY_CONFIG:
@@ -133,7 +130,7 @@ for iter_and_params in itertools.product(*param_iterables):
 
     # write the analysis ensemble mean and variance to separate files (per
     # state variable)
-    ensemble_stats(core.datadir_output, all_proxy_objs, save_full_field)
+    ensemble_stats(core.datadir_output, all_proxy_objs, core.save_full_field)
 
     # start: DO NOT DELETE
     # move files from local disk to an archive location
