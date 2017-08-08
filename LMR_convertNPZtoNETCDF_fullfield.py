@@ -15,6 +15,7 @@ Revisions: None
 import glob
 import numpy as np
 from netCDF4 import Dataset
+import os
 
 # --- Begin section of user-defined parameters ---
 
@@ -203,11 +204,7 @@ for var in listvars:
             lon.units = 'degrees_east'
             lon.long_name = 'longitude'
 
-            #varout = outfile.createVariable(varname, 'f', ('ensemble_member','time', 'lat','lon'))
-            varout = outfile.createVariable(varname, 'f', ('ensemble_member','time', 'lat','lon'),zlib=True,complevel=4)
-            #varout = outfile.createVariable(varname, 'f', ('ensemble_member','time', 'lat','lon'),zlib=True,complevel=9)
-            #varout = outfile.createVariable(varname, 'i2', ('ensemble_member','time', 'lat','lon'))   # NOT WORKING CORRECTLY
-            #varout = outfile.createVariable(varname, 'i1', ('ensemble_member','time', 'lat','lon'))   # NOT WORKING CORRECTLY
+            varout = outfile.createVariable(varname, 'f', ('ensemble_member','time', 'lat','lon'),zlib=True,complevel=4,fletcher32=True)
             varout.description = var_desc[var][0]
             varout.long_name = var_desc[var][1]
             varout.units = var_desc[var][2]
@@ -232,7 +229,7 @@ for var in listvars:
             lev.units = 'm'
             lev.long_name = 'depth'
 
-            varout = outfile.createVariable(varname, 'f', ('ensemble_member','time', 'lat','lev'))        
+            varout = outfile.createVariable(varname, 'f', ('ensemble_member','time', 'lat','lev'),zlib=True,complevel=4,fletcher32=True)        
             varout.description = var_desc[var][0]
             varout.long_name = var_desc[var][1]
             varout.units = var_desc[var][2]
@@ -244,7 +241,7 @@ for var in listvars:
             varout[:] = mc_ens_outarr
 
         elif field_type == '1D:time_series':
-            varout = outfile.createVariable(varname, 'f', ('ensemble_member','time'))        
+            varout = outfile.createVariable(varname, 'f', ('ensemble_member','time'),zlib=True,complevel=4,fletcher32=True)        
             varout.description = var_desc[var][0]
             varout.long_name = var_desc[var][1]
             varout.units = var_desc[var][2]
@@ -262,3 +259,8 @@ for var in listvars:
         # Closing the file
         outfile.close()
 
+        # The initial netcdf contains some compression (zlib=True,complevel=4) and error detection (fletcher32=True).
+        # Use ncpdq to create a smaller version of the newly-created netcdf file using short (16-bit) integers.
+        # This is a lossy compression which saves about 5 significant digits, but takes up less storage space.
+        cmd = 'ncpdq -O -P all_new ' + outfile_nc + ' ' + outfile_nc
+        os.system(cmd)
