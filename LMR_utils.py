@@ -11,7 +11,8 @@ Revisions:
           - Added the get_distance function for more efficient calculation of distances
             between lat/lon points on the globe. [R. Tardif, U. of Washington, January 2016]
 
-          - 
+          - Added the option to save full fields of variables. [M. Erb, U. Southern California,
+            June 2017]
 
 
 """
@@ -256,7 +257,7 @@ def smooth2D(im, n=15):
     improc = signal.convolve2d(im, g, mode='same', boundary=bndy)
     return(improc)
 
-def ensemble_stats(workdir, y_assim):
+def ensemble_stats(workdir, y_assim, save_full_field=False):
     """
     Compute the ensemble mean and variance for files in the input directory
 
@@ -323,6 +324,7 @@ def ensemble_stats(workdir, y_assim):
 
             # Process the **analysis** (i.e. posterior) files
             years = []
+            xa_ens = np.zeros([nyears,ndim1,ndim2,nens])
             xam = np.zeros([nyears,ndim1,ndim2])
             xav = np.zeros([nyears,ndim1,ndim2],dtype=np.float64)
             k = -1
@@ -335,6 +337,7 @@ def ensemble_stats(workdir, y_assim):
                 years.append(year)
                 Xatmp = np.load(f)
                 Xa = np.reshape(Xatmp[ibeg:iend+1,:],(ndim1,ndim2,nens))
+                xa_ens[k,:,:,:] = Xa                  # total ensemble
                 xam[k,:,:] = np.mean(Xa,axis=2)       # ensemble mean
                 xav[k,:,:] = np.var(Xa,axis=2,ddof=1) # ensemble variance
 
@@ -348,6 +351,8 @@ def ensemble_stats(workdir, y_assim):
             coord1 = np.reshape(Xb_coords[ibeg:iend+1,0],(state_info[var]['spacedims'][0],state_info[var]['spacedims'][1]))
             coord2 = np.reshape(Xb_coords[ibeg:iend+1,1],(state_info[var]['spacedims'][0],state_info[var]['spacedims'][1]))
 
+            vars_to_save_ens  = {'nens':nens, 'years':years, dimcoord1:state_info[var]['spacedims'][0], dimcoord2:state_info[var]['spacedims'][1], \
+                                     coordname1:coord1, coordname2:coord2, 'xb_ens':Xb, 'xa_ens':xa_ens}
             vars_to_save_mean = {'nens':nens, 'years':years, dimcoord1:state_info[var]['spacedims'][0], dimcoord2:state_info[var]['spacedims'][1], \
                                      coordname1:coord1, coordname2:coord2, 'xbm':xbm, 'xam':xam}
             vars_to_save_var  = {'nens':nens, 'years':years, dimcoord1:state_info[var]['spacedims'][0], dimcoord2:state_info[var]['spacedims'][1], \
@@ -366,6 +371,7 @@ def ensemble_stats(workdir, y_assim):
 
             # Process the **analysis** (i.e. posterior) files
             years = []
+            xa_ens = np.zeros([nyears,ndim1,ndim2,nens])
             xam = np.zeros([nyears,ndim1,ndim2])
             xav = np.zeros([nyears,ndim1,ndim2],dtype=np.float64)
             k = -1
@@ -378,6 +384,7 @@ def ensemble_stats(workdir, y_assim):
                 years.append(year)
                 Xatmp = np.load(f)
                 Xa = np.reshape(Xatmp[ibeg:iend+1,:],(ndim1,ndim2,nens))
+                xam[k,:,:,:] = Xa                     # total ensemble
                 xam[k,:,:] = np.mean(Xa,axis=2)       # ensemble mean
                 xav[k,:,:] = np.var(Xa,axis=2,ddof=1) # ensemble variance
 
@@ -391,6 +398,8 @@ def ensemble_stats(workdir, y_assim):
             coord1 = np.reshape(Xb_coords[ibeg:iend+1,0],(state_info[var]['spacedims'][0],state_info[var]['spacedims'][1]))
             coord2 = np.reshape(Xb_coords[ibeg:iend+1,1],(state_info[var]['spacedims'][0],state_info[var]['spacedims'][1]))
 
+            vars_to_save_ens  = {'nens':nens, 'years':years, dimcoord1:state_info[var]['spacedims'][0], dimcoord2:state_info[var]['spacedims'][1], \
+                                     coordname1:coord1, coordname2:coord2, 'xb_ens':Xb, 'xa_ens':xa_ens}
             vars_to_save_mean = {'nens':nens, 'years':years, dimcoord1:state_info[var]['spacedims'][0], dimcoord2:state_info[var]['spacedims'][1], \
                                      coordname1:coord1, coordname2:coord2, 'xbm':xbm, 'xam':xam}
             vars_to_save_var  = {'nens':nens, 'years':years, dimcoord1:state_info[var]['spacedims'][0], dimcoord2:state_info[var]['spacedims'][1], \
@@ -408,6 +417,7 @@ def ensemble_stats(workdir, y_assim):
 
             # Process the **analysis** (i.e. posterior) files
             years = []
+            xa_ens = np.zeros([nyears,ndim1,nens])
             xam = np.zeros([nyears,ndim1])
             xav = np.zeros([nyears,ndim1],dtype=np.float64)
             k = -1
@@ -420,6 +430,7 @@ def ensemble_stats(workdir, y_assim):
                 years.append(year)
                 Xatmp = np.load(f)
                 Xa = np.reshape(Xatmp[ibeg:iend+1,:],(ndim1,nens))
+                xa_ens[k,:,:] = Xa                  # total ensemble
                 xam[k,:] = np.mean(Xa,axis=1)       # ensemble mean
                 xav[k,:] = np.var(Xa,axis=1,ddof=1) # ensemble variance
 
@@ -429,6 +440,8 @@ def ensemble_stats(workdir, y_assim):
 
             coord1 = np.reshape(Xb_coords[ibeg:iend+1,0],(state_info[var]['spacedims'][0]))
 
+            vars_to_save_ens  = {'nens':nens, 'years':years, dimcoord1:state_info[var]['spacedims'][0], \
+                                     coordname1:coord1, 'xb_ens':Xb, 'xa_ens':xa_ens}
             vars_to_save_mean = {'nens':nens, 'years':years, dimcoord1:state_info[var]['spacedims'][0], \
                                      coordname1:coord1, 'xbm':xbm, 'xam':xam}
             vars_to_save_var  = {'nens':nens, 'years':years, dimcoord1:state_info[var]['spacedims'][0], \
@@ -474,6 +487,10 @@ def ensemble_stats(workdir, y_assim):
             continue
 
 
+        if (state_info[var]['vartype'] != '0D:time series') and (save_full_field == True):
+            filen = workdir + '/ensemble_full_' + var
+            print 'writing the new ensemble file' + filen
+            np.savez(filen, **vars_to_save_ens)
 
         # --- Write data to files ---
         # ens. mean to file
