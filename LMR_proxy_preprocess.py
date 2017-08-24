@@ -71,7 +71,7 @@ def main():
     # - Only PAGES2kv2 : include_NCDC = False, include_PAGES2kphase2 = True
     include_NCDC = True
     include_PAGES2kphase2 = True
-    PAGES2kphase2file = 'PAGES2k_v2.0.0_tempOnly.pklz'
+    PAGES2kphase2file = 'PAGES2k_v2.0.0_tempOnly.pckl'
 
     # File containing info on duplicates in proxy records
     infoDuplicates = 'Proxy_Duplicates_PAGES2kv2_NCDC_LMRv0.2.0.xlsx'
@@ -577,7 +577,7 @@ def pages2kv2_pickle_to_dict(datadir, pages2kv2_file, proxy_def, year_type, gaus
     if os.path.isfile(infile):
         print('Data from PAGES2k phase 2:')
         print(' Uploading data from %s ...' %infile)
-        f = gzip.open(infile,'rb')
+        f = open(infile,'rb')
         pages2k_data = pickle.load(f)
         f.close()
     else:
@@ -668,6 +668,8 @@ def pages2kv2_pickle_to_dict(datadir, pages2kv2_file, proxy_def, year_type, gaus
         # Rename some of the the proxy measurements to be more standard.
         if (pages2k_data[counter]['archiveType'] == 'Ice Cores') and (pages2k_data[counter]['paleoData_variableName'] == 'd18O1'):
             pages2k_data[counter]['paleoData_variableName'] = 'd18O'
+        elif (pages2k_data[counter]['archiveType'] == 'Tree Rings') and (pages2k_data[counter]['paleoData_variableName'] == 'temperature1'):
+            pages2k_data[counter]['paleoData_variableName'] = 'temperature'
         elif (pages2k_data[counter]['archiveType'] == 'Lake Cores') and (pages2k_data[counter]['paleoData_variableName'] == 'temperature1'):
             pages2k_data[counter]['paleoData_variableName'] = 'temperature'
         elif (pages2k_data[counter]['archiveType'] == 'Lake Cores') and (pages2k_data[counter]['paleoData_variableName'] == 'temperature3'):
@@ -709,6 +711,16 @@ def pages2kv2_pickle_to_dict(datadir, pages2kv2_file, proxy_def, year_type, gaus
         else:
             if year_type == 'tropical year': pages2k_data_seasonality = [4,5,6,7,8,9,10,11,12,13,14,15]
             else: pages2k_data_seasonality = [1,2,3,4,5,6,7,8,9,10,11,12]
+
+        # If the year type is "tropical", change all annual records to the tropical-year mean.
+        if year_type == 'tropical year' and pages2k_data_seasonality == [1,2,3,4,5,6,7,8,9,10,11,12]:
+            pages2k_data_seasonality = [4,5,6,7,8,9,10,11,12,13,14,15]
+
+        # Fix two values:
+        if pages2k_data_seasonality == [6,7,2008]:
+            pages2k_data_seasonality = [6,7,8]
+        elif pages2k_data_seasonality == [7,8,2009]:
+            pages2k_data_seasonality = [7,8,9]
 
         # Spell out the name of the interpretation variable.
         if pages2k_data[counter]['climateInterpretation_variable'] == 'T':
@@ -845,7 +857,7 @@ def colonReader(string, fCon, fCon_low, end):
 
 # ===================================================================================
 
-def read_proxy_data_NCDCtxt(site, proxy_def, year_type=None):
+def read_proxy_data_NCDCtxt(site, proxy_def, year_type=None, gaussianize_data=False):
 #====================================================================================
 # Purpose: Reads data from a selected site (chronology) in NCDC proxy dataset
 # 
@@ -1184,6 +1196,10 @@ def read_proxy_data_NCDCtxt(site, proxy_def, year_type=None):
                 d['Relation_to_temp'] = None
                 d['Sensitivity'] = None
 
+            # If the year type is "tropical", change all annual records to the tropical-year mean.
+            if year_type == 'tropical year' and d['Seasonality'] == [1,2,3,4,5,6,7,8,9,10,11,12]:
+                d['Seasonality'] = [4,5,6,7,8,9,10,11,12,13,14,15]
+
         except EmptyError, e:
             print(e)
             return (None, None)
@@ -1449,6 +1465,11 @@ def read_proxy_data_NCDCtxt(site, proxy_def, year_type=None):
         # If subannual, average up to annual --------------------------------------------------------
         time_annual, data_annual, proxy_resolution = compute_annual_means(time_raw,data_raw,valid_frac,year_type)
         
+        # If gaussianize_data is set to true, transform the proxy data to Gaussian.
+        # This option should only be used when using regressions, not physically-based PSMs.
+        if gaussianize_data == True:
+            data_annual = gaussianize(data_annual)
+        
         # update to yearRange given availability of annual data
         yearRange = (int('%.0f' %time_annual[0]),int('%.0f' %time_annual[-1]))
         
@@ -1552,7 +1573,7 @@ def ncdc_txt_to_dict(datadir, proxy_def, year_type, gaussianize_data):
     nbsites_valid = 0
     for file_site in sites_data:
 
-        proxy_list, duplicate_list = read_proxy_data_NCDCtxt(file_site,proxy_def,year_type)
+        proxy_list, duplicate_list = read_proxy_data_NCDCtxt(file_site,proxy_def,year_type,gaussianize_data)
 
         if proxy_list: # if returned list is not empty
             # extract data from list and populate the master proxy dictionary
