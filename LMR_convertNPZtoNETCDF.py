@@ -18,11 +18,11 @@ from netCDF4 import Dataset, num2date
 # --- Begin section of user-defined parameters ---
 
 # name of directory where the output of LMR experiments are located
-datadir = '/home/disk/ekman4/rtardif/LMR/output'
+#datadir = '/home/disk/ekman4/rtardif/LMR/output'
+datadir = '/home/disk/kalman3/rtardif/LMR/output'
 
 # name of the experiment
-nexp = 't2_2k_CCSM4_LastMillenium_ens100_cGISTEMP_NCDCproxiesPagesTrees_pf0.75'
-#nexp = 'testPslW500Prcp_2c_CCSM4_LM_cGISTEMP_NCDCproxiesPagesTrees_pf0.75'
+nexp = 'test'
 
 
 # Dictionary containing definitions of variables that can be handled by this code
@@ -32,12 +32,15 @@ var_desc = \
         'tas_sfc_Amon'              : ('Tsfc', 'Near surface air temperature anomaly', 'K'),   \
         'psl_sfc_Amon'              : ('MSLP', 'Mean sea level pressure anomaly', 'Pa'),       \
         'pr_sfc_Amon'               : ('PRCP', 'Precipitation rate anomaly', 'kg/m2/s1'),      \
+        'scpdsi_sfc_Amon'           : ('scpdsi','self-calibrated Palmer Drought Severity Index', ''), \
         'uas_sfc_Amon'              : ('Usfc', 'Near surface zonal wind anomaly', 'm/s'),      \
         'vas_sfc_Amon'              : ('Vsfc', 'Near surface meridional wind anomaly', 'm/s'), \
         'zg_500hPa_Amon'            : ('H500', '500hPa geopotential height anomaly', 'm'),     \
         'wap_500hPa_Amon'           : ('W500', '500hPa vertical motion anomaly', 'Ps/s'),      \
+        'wap_700hPa_Amon'           : ('W700', '700hPa vertical motion anomaly', 'Ps/s'),      \
         'ua_500hPa_Amon'            : ('U500', '500hPa zonal wind anomaly', 'm/s'),            \
         'va_500hPa_Amon'            : ('V500', '500hPa meridional wind anomaly', 'm/s'),       \
+        'tos_sfc_Omon'              : ('tos',  'Sea surface temperature', 'K'),                \
         'ohcArctic_0-700m_Omon'     : ('ohcArctic_0to700m','Basin-averaged Ocean Heat Content of Arctic Ocean in 0-700m layer','J'),          \
         'ohcAtlanticNH_0-700m_Omon' : ('ohcAtlanticNH_0to700m','Basin-averaged Ocean Heat Content of N. Atlantic Ocean in 0-700m layer','J'), \
         'ohcAtlanticSH_0-700m_Omon' : ('ohcAtlanticNH_0to700m','Basin-averaged Ocean Heat Content of S. Atlantic Ocean in 0-700m layer','J'), \
@@ -58,7 +61,7 @@ expdir = datadir + '/'+nexp
 # where the netcdf files are created 
 outdir = expdir
 
-print '\n Getting information on Monte-Carlo realizations...\n'
+print('\n Getting information on Monte-Carlo realizations...\n')
 
 dirs = glob.glob(expdir+"/r*")
 # sorted
@@ -68,10 +71,10 @@ mcdirs = [item.split('/')[-1] for item in dirs]
 # number of MC realizations found
 niters = len(mcdirs) 
 
-print 'mcdirs:' + str(mcdirs)
-print 'niters = ' + str(niters)
+print('mcdirs:' + str(mcdirs))
+print('niters = ' + str(niters))
 
-print '\n Getting information on reconstructed variables...\n'
+print('\n Getting information on reconstructed variables...\n')
 
 # look in first "mcdirs" only. It should be the same for all. 
 workdir = expdir+'/'+mcdirs[0]
@@ -84,11 +87,11 @@ listfiles = [item.split('/')[-1] for item in listdirfiles]
 # strip everything but variable name
 listvars = [(item.replace('ensemble_mean_','')).replace('.npz','') for item in listfiles]
 
-print 'Variables:', listvars, '\n'
+print('Variables:', listvars, '\n')
 
 # Loop over variables
 for var in listvars:
-    print '\n Variable:', var
+    print('\n Variable:', var)
     # Loop over realizations
     r = 0
     for dir in mcdirs:
@@ -101,7 +104,7 @@ for var in listvars:
         if r == 0: # first realization
 
             npzcontent = npzfile.files
-            print '  file contents:', npzcontent
+            print('  file contents:', npzcontent)
             
             # get the years in the reconstruction ... for some reason stored in an array of strings ...
             years_str =  npzfile['years']
@@ -111,39 +114,39 @@ for var in listvars:
             # Determine type of variation, get spatial coordinates if present
             if 'lat' in npzcontent and 'lon' in npzcontent:
                 field_type = '2D:horizontal'
-                print '  field type:', field_type
+                print('  field type:', field_type)
                 # get lat/lon data
                 lat2d = npzfile['lat']
                 lon2d = npzfile['lon']
                 #print '  ', lat2d.shape, lon2d.shape
                 lat1d = lat2d[:,0]
                 lon1d = lon2d[0,:]
-                print '  nlat/nlon=', lat1d.shape, lon1d.shape
+                print('  nlat/nlon=', lat1d.shape, lon1d.shape)
 
             elif 'lat' in npzcontent and 'lev' in npzcontent:
                 field_type = '2D:meridional_vertical'
-                print '  field type:', field_type
+                print('  field type:', field_type)
                 # get lat/lev data
                 lat2d = npzfile['lat']
                 lev2d = npzfile['lev']
                 #print '  ', lat2d.shape, lev2d.shape
                 lat1d = lat2d[:,0]
                 lev1d = lev2d[0,:]
-                print '  nlat/nlev=', lat1d.shape, lev1d.shape
+                print('  nlat/nlev=', lat1d.shape, lev1d.shape)
                  
             elif 'lat' not in npzcontent and 'lon' not in npzcontent and 'lev' not in npzcontent:
                 # no spatial coordinate, must be a scalar (time series)
                 field_type='1D:time_series'
-                print '  field type:', field_type
+                print('  field type:', field_type)
             else:
-                print 'Cannot handle this variable yet! Variable of unrecognized dimensions... Exiting!'
+                print('Cannot handle this variable yet! Variable of unrecognized dimensions... Exiting!')
                 exit(1)
 
             
             # declare master array that will contain data from all the M-C realizations 
             # (i.e. the "Monte-Carlo ensemble")
             dims = field_values.shape
-            print '  xam field dimensions', dims
+            print('  xam field dimensions', dims)
             tmp = np.expand_dims(field_values, axis=0)
             # Form the array with the right total dimensions
             mc_ens = np.repeat(tmp,niters,axis=0)
@@ -260,7 +263,7 @@ for var in listvars:
         varout[:] = mc_ens_outarr        
         
     else:
-        print 'Variable of unrecognized dimensions... Exiting!'
+        print('Variable of unrecognized dimensions... Exiting!')
         exit(1)
         
     

@@ -1,4 +1,5 @@
-Last Millennium Reanalysis (LMR) project codebase release 2.0 
+
+Last Millennium Reanalysis (LMR) project codebase release 2.0
 
 Originators: R. Tardif, W. A. Perkins, G. J. Hakim
              University of Washington
@@ -32,7 +33,7 @@ You must read and understand the version 1 instructions (README) before proceedi
      . For proxy_data_source = 'NCDC': This is the directory where subdirectories
        NCDC/ToPandas_<<dbversion>> are located. 
        The <<datadir>>/NCDC/ToPandas_<<dbversion>> directory should contain all 
-       the NCDC-templated .txt files corresponding to the proxy records the user 
+       the NCDC-templated .txt files corresponding to the proxy records the user
        wants to include in the database of proxies to be assimilated. 
 
    - outdir: Directory where the .pckl files containing the Pandas dataframes 
@@ -61,7 +62,7 @@ You must read and understand the version 1 instructions (README) before proceedi
        Ex. (1850,2000)
 
    * In class v_proxies:
-     - use_from: List defining the proxy database to use. 
+     - use_from: List defining the proxy database to 
        Either ['pages'] or ['NCDC']
 
    * In class _ncdc:
@@ -128,3 +129,4 @@ You must read and understand the version 1 instructions (README) before proceedi
 
 4) Run the experiment:
 python LMR_wrapper.py
+
