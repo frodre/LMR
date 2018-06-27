@@ -99,12 +99,12 @@ def main():
     # This option transforms all data to a Gaussian distribution.  It should only be used for
     # linear regressions, not physically-based PSMs.
     gaussianize_data = False
-    
+
     # Specify the type of year to use for data averaging. "calendar year" (Jan-Dec)
     # or "tropical year" (Apr-Mar)
     year_type = "calendar year"
     #year_type = "tropical year"
-    
+
     # --- *** --- *** --- *** --- *** --- *** --- *** --- *** --- *** --- *** ---
 
     #proxy_data_source = 'DTDA'
@@ -116,11 +116,11 @@ def main():
 
     # datadir: directory where the original proxy datafiles are located
     # datadir = '/home/katabatic2/wperkins/data/LMR/proxies/'
-    datadir = '/home/disk/kalman3/rtardif/LMR/data/proxies/'
+    datadir = '/Users/fzhu/GoogleDrive/Data/LMR/LMR_data/data/proxies'
 
     # outdir: directory where the proxy database files will be created
     #         The piece before /data/proxies should correspond to your "lmr_path" set in LMR_config.py
-    outdir  = '/home/disk/kalman3/rtardif/LMR/data/proxies/'
+    outdir  = '/Users/fzhu/GoogleDrive/Data/LMR/LMR_data/data/proxies/test'
 
     #
     # Section for User-defined options: end
@@ -147,7 +147,7 @@ def main():
         if not outdir[-1] == '/':
             outdir = outdir+'/'
 
-    
+
     if proxy_data_source == 'PAGES2Kv1':
         # ============================================================================
         # PAGES2Kv1 proxy data -------------------------------------------------------
@@ -433,8 +433,8 @@ def pages_xcel_to_dataframes(filename, metaout, dataout, take_average_out):
     if not os.path.isfile(filename):
         print('ERROR: File %s does not exist. Please make sure'
               ' input file is located in right directory.' %filename)
-        raise SystemExit(1)    
-    
+        raise SystemExit(1)
+
     meta_sheet_name = 'Metadata'
     metadata = pd.read_excel(filename, meta_sheet_name)
     # rename 'PAGES ID' column header to more general 'Proxy ID'
@@ -1646,7 +1646,7 @@ def ncdc_txt_to_dict(datadir, proxy_def, year_type, gaussianize_data):
               ' %s. Please revise your user-defined parameters or directory/'
               ' data set-up.' %datadir)
         raise SystemExit(1)
-        
+
     # Master dictionary containing all proxy chronologies extracted from the data files.
     proxy_dict_ncdc = {}
     dupelist = []
