@@ -76,6 +76,7 @@ from LMR_DA import enkf_update_array, cov_localization
 from LMR_utils import FlagError
 
 import f2py_enkf as f2py
+from pathos.multiprocessing import ProcessingPool as Pool
 
 def LMR_driver_callable(cfg=None):
 
@@ -515,9 +516,9 @@ def LMR_driver_callable(cfg=None):
     # -------------------------------------
     # Loop over years of the reconstruction
     # -------------------------------------
-    lasttime = time()
-    for yr_idx, t in enumerate(range(recon_period[0], recon_period[1]+1, recon_timescale)):
 
+    def loop_over_year(yr_idx, t):
+        lasttime = time()
         start_yr = int(t-recon_timescale//2)
         end_yr = int(t+recon_timescale//2)
 
@@ -597,14 +598,14 @@ def LMR_driver_callable(cfg=None):
                        str(Ye.mean())))
 
             # Update the state
-            #  Xa = enkf_update_array(Xb, Yobs, Ye, ob_err, loc, inflate)
+            Xa = enkf_update_array(Xb, Yobs, Ye, ob_err, loc, inflate)
 
             # f2py version by fzhu
-            Nx, Nens = np.shape(Xb)
-            if inflate is None:
-                inflate = 1
+            #  Nx, Nens = np.shape(Xb)
+            #  if inflate is None:
+                #  inflate = 1
 
-            Xa = f2py.f2py_enkf.enkf_update_array(Xb, Yobs, Ye, ob_err, inflate, Nx, Nens)
+            #  Xa = f2py.f2py_enkf.enkf_update_array(Xb, Yobs, Ye, ob_err, inflate, Nx, Nens)
 
             # TODO: AP Temporary fix for no TAS in state
             if tas_var:
@@ -645,6 +646,13 @@ def LMR_driver_callable(cfg=None):
             np.save(filen, Xb.filled())
         except AttributeError as e:
             np.save(filen, Xb)
+
+    #  for yr_idx, t in enumerate(range(recon_period[0], recon_period[1]+1, recon_timescale)):
+    #      loop_over_year(yr_idx, t)
+    recon_years = range(recon_period[0], recon_period[1]+1, recon_timescale)
+    with Pool(8) as pool:
+        pool.map(loop_over_year, range(np.size(recon_years)), recon_years)
+
 
     end_time = time() - begin_time
 
