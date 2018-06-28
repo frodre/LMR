@@ -4,7 +4,7 @@
 ! 2017-06-26 09:30:38
 !---------------------------------------------------------------------------------
 
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+! #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 
 module f2py_enkf
     implicit none
@@ -15,19 +15,18 @@ module f2py_enkf
         implicit none
         !---------------------------------------------------------------------------------
         integer, intent(in) :: Nx, Nens
-        real, dimension(Nx, Nens), intent(in) :: Xb
-        real, dimension(Nens), intent(in) :: Ye
-        real, intent(in) :: obvalue, ob_err, inflate
-        real, dimension(Nx, Nens), intent(out) :: Xa
+        double precision, dimension(Nx, Nens), intent(in) :: Xb
+        double precision, dimension(Nens), intent(in) :: Ye
+        double precision, intent(in) :: obvalue, ob_err, inflate
+        double precision, dimension(Nx, Nens), intent(out) :: Xa
         !---------------------------------------------------------------------------------
-        integer :: i
-        real :: mye, varye, innov, kdenom, beta
-        real, dimension(Nx) :: xbm, kcov, xam, kmat
-        real, dimension(Nx, Nens) :: Xbp, Xap
-        real, dimension(Nens) :: yep
-        real, dimension(1, Nens) :: yepT
-        ! real, intent(out) :: kmat
-        real, dimension(Nx, 1) :: kcovT, kmatT
+        double precision :: mye, varye, innov, kdenom, beta
+        double precision, dimension(Nx) :: xbm, kcov, xam, kmat
+        double precision, dimension(Nx, Nens) :: Xbp, Xap
+        double precision, dimension(Nens) :: yep
+        double precision, dimension(1, Nens) :: yepT
+        ! double precision, intent(out) :: kmat
+        double precision, dimension(Nx, 1) :: kcovT, kmatT
 
         ! ensemble mean background and perturbations
         xbm = sum(Xb, 2) / size(Xb, 2)
