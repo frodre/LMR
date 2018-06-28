@@ -1,5 +1,5 @@
 #==========================================================================================
-# Data assimilation function. 
+# Data assimilation function.
 #
 # Define the data assimilation function
 # This version uses passed arrays, and updates the ensemble for a single time
@@ -20,14 +20,14 @@ def enkf_update_array(Xb, obvalue, Ye, ob_err, loc=None, inflate=None):
 
     Revisions:
 
-    1 September 2017: 
-                    - changed varye = np.var(Ye) to varye = np.var(Ye,ddof=1) 
-                    for an unbiased calculation of the variance. 
+    1 September 2017:
+                    - changed varye = np.var(Ye) to varye = np.var(Ye,ddof=1)
+                    for an unbiased calculation of the variance.
                     (G. Hakim - U. Washington)
-    
+
     -----------------------------------------------------------------
      Inputs:
-          Xb: background ensemble estimates of state (Nx x Nens) 
+          Xb: background ensemble estimates of state (Nx x Nens)
      obvalue: proxy value
           Ye: background ensemble estimate of the proxy (Nens x 1)
       ob_err: proxy error variance
@@ -42,11 +42,11 @@ def enkf_update_array(Xb, obvalue, Ye, ob_err, loc=None, inflate=None):
     xbm = np.mean(Xb,axis=1)
     Xbp = np.subtract(Xb,xbm[:,None])  # "None" means replicate in this dimension
 
-    # ensemble mean and variance of the background estimate of the proxy 
+    # ensemble mean and variance of the background estimate of the proxy
     mye   = np.mean(Ye)
     varye = np.var(Ye,ddof=1)
 
-    # lowercase ye has ensemble-mean removed 
+    # lowercase ye has ensemble-mean removed
     ye = np.subtract(Ye, mye)
 
     # innovation
@@ -56,7 +56,7 @@ def enkf_update_array(Xb, obvalue, Ye, ob_err, loc=None, inflate=None):
         print('innovation error. obvalue = ' + str(obvalue) + ' mye = ' + str(mye))
         print('returning Xb unchanged...')
         return Xb
-    
+
     # innovation variance (denominator of serial Kalman gain)
     kdenom = (varye + ob_err)
 
@@ -64,13 +64,15 @@ def enkf_update_array(Xb, obvalue, Ye, ob_err, loc=None, inflate=None):
     kcov = np.dot(Xbp,np.transpose(ye)) / (Nens-1)
 
     # Option to inflate the covariances by a certain factor
-    if inflate is not None:
-        kcov = inflate * kcov
+    #  if inflate is not None:
+    #      kcov = inflate * kcov
+
+    kcov = inflate * kcov  # modified by fzhu: take inflate=1 by default to avoid if
 
     # Option to localize the gain
     #if loc is not None:
     #    kcov = np.multiply(kcov,loc) # This implementation is not correct. To be revised later.
-   
+
     # Kalman gain
     kmat = np.divide(kcov, kdenom)
 
@@ -87,28 +89,28 @@ def enkf_update_array(Xb, obvalue, Ye, ob_err, loc=None, inflate=None):
     # full state
     Xa = np.add(xam[:,None], Xap)
 
-    # if masked array, making sure that fill_value = nan in the new array 
+    # if masked array, making sure that fill_value = nan in the new array
     if np.ma.isMaskedArray(Xa): np.ma.set_fill_value(Xa, np.nan)
 
-    
+
     # Return the full state
     return Xa
 
 
-#========================================================================================== 
+#==========================================================================================
 #
-#========================================================================================== 
+#==========================================================================================
 
 def cov_localization(locRad, Y, X, X_coords):
     """
 
-    Originator: R. Tardif, 
+    Originator: R. Tardif,
                 Dept. Atmos. Sciences, Univ. of Washington
     -----------------------------------------------------------------
      Inputs:
         locRad : Localization radius (distance in km beyond which cov are forced to zero)
              Y : Proxy object, needed to get ob site lat/lon (to calculate distances w.r.t. grid pts
-             X : Prior object, needed to get state vector info. 
+             X : Prior object, needed to get state vector info.
       X_coords : Array containing geographic location information of state vector elements
 
      Output:
@@ -126,13 +128,13 @@ def cov_localization(locRad, Y, X, X_coords):
     # Mask to identify elements of state vector that are "localizeable"
     # i.e. fields with (lat,lon)
     localizeable = covLoc == 1. # Initialize as True
-    
+
     for var in X.trunc_state_info.keys():
         [var_state_pos_begin,var_state_pos_end] =  X.trunc_state_info[var]['pos']
         # if variable is not a field with lats & lons, tag localizeable as False
         if X.trunc_state_info[var]['spacecoords'] != ('lat', 'lon'):
             localizeable[var_state_pos_begin:var_state_pos_end+1] = False
-    
+
     # array of distances between state vector elements & proxy site
     # initialized as zeros: this is important!
     dists = np.zeros(shape=[stateVectDim])
@@ -144,7 +146,7 @@ def cov_localization(locRad, Y, X, X_coords):
     X_lon = X_coords[:,1]
     X_lat = X_coords[:,0]
 
-    # calculate distances for elements tagged as "localizeable". 
+    # calculate distances for elements tagged as "localizeable".
     dists[localizeable] = np.array(LMR_utils.haversine(site_lon, site_lat,
                                                        X_lon[localizeable],
                                                        X_lat[localizeable]),dtype=np.float64)
@@ -153,11 +155,11 @@ def cov_localization(locRad, Y, X, X_coords):
     # so these elements will not be included in the indexing
     # according to distances (see below)
     dists[~localizeable] = np.nan
-    
+
     # Some transformation to variables used in calculating localization weights
     hlr = 0.5*locRad; # work with half the localization radius
     r = dists/hlr;
-    
+
     # indexing w.r.t. distances
     ind_inner = np.where(dists <= hlr)    # closest
     ind_outer = np.where(dists >  hlr)    # close
@@ -179,5 +181,5 @@ def cov_localization(locRad, Y, X, X_coords):
     # TODO: revisit calculations to minimize round-off errors
     covLoc[covLoc < 0.0] = 0.0
 
-    
+
     return covLoc

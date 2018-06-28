@@ -97,6 +97,7 @@ def LMR_driver_callable(cfg=None):
     recon_timescale = core.recon_timescale
     online = core.online_reconstruction
     nens = core.nens
+    nthread = core.nthread  # added by fzhu
     loc_rad = core.loc_rad
     inflation_fact = core.inflation_fact
     prior_source = prior.prior_source
@@ -170,7 +171,9 @@ def LMR_driver_callable(cfg=None):
         print('-----------------------------------------------------')
 
     # check covariance inflation from config
-    inflate = None
+    #  inflate = None
+    inflate = 1  # modified by fzhu
+
     if inflation_fact is not None:
         inflate = inflation_fact
         if verbose > 2:
@@ -598,14 +601,11 @@ def LMR_driver_callable(cfg=None):
                        str(Ye.mean())))
 
             # Update the state
-            Xa = enkf_update_array(Xb, Yobs, Ye, ob_err, loc, inflate)
+            #  Xa = enkf_update_array(Xb, Yobs, Ye, ob_err, loc, inflate)
 
             # f2py version by fzhu
-            #  Nx, Nens = np.shape(Xb)
-            #  if inflate is None:
-                #  inflate = 1
-
-            #  Xa = f2py.f2py_enkf.enkf_update_array(Xb, Yobs, Ye, ob_err, inflate, Nx, Nens)
+            Nx, Nens = np.shape(Xb)
+            Xa = f2py.f2py_enkf.enkf_update_array(Xb, Yobs, Ye, ob_err, inflate, Nx, Nens)
 
             # TODO: AP Temporary fix for no TAS in state
             if tas_var:
@@ -650,7 +650,7 @@ def LMR_driver_callable(cfg=None):
     #  for yr_idx, t in enumerate(range(recon_period[0], recon_period[1]+1, recon_timescale)):
     #      loop_over_year(yr_idx, t)
     recon_years = range(recon_period[0], recon_period[1]+1, recon_timescale)
-    with Pool(8) as pool:
+    with Pool(nthread) as pool:
         pool.map(loop_over_year, range(np.size(recon_years)), recon_years)
 
 
