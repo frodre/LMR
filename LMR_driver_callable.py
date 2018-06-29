@@ -662,11 +662,24 @@ def LMR_driver_callable(cfg=None):
         except AttributeError as e:
             np.save(filen, Xb)
 
-    #  for yr_idx, t in enumerate(range(recon_period[0], recon_period[1]+1, recon_timescale)):
-    #      loop_over_year(yr_idx, t)
+    loop_begin_time = time()  # added by fzhu
     recon_years = range(recon_period[0], recon_period[1]+1, recon_timescale)
-    with Pool(nthread) as pool:
-        pool.map(loop_over_year, range(np.size(recon_years)), recon_years)
+
+    if nthread == 1:
+        for yr_idx, t in enumerate(range(recon_period[0], recon_period[1]+1, recon_timescale)):
+            loop_over_year(yr_idx, t)
+    elif nthread > 1:
+        with Pool(nthread) as pool:
+            pool.map(loop_over_year, range(np.size(recon_years)), recon_years)
+    else:
+        print('ERROR: Wrong nthread value!!!')
+        raise SystemExit(1)
+
+    loop_end_time = time()  # added by fzhu
+    print('=====================================================')
+    print('DA total time: ' + str((loop_end_time-loop_begin_time)/60.0) + ' mins')
+    print('=====================================================')
+
 
 
     end_time = time() - begin_time

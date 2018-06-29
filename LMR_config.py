@@ -91,7 +91,8 @@ LEGACY_CONFIG = False
 # Absolute path to LMR source code directory
 #SRC_DIR = '/home/disk/ekman/rtardif/codes/LMR/pyLMR'
 #  SRC_DIR = '/home/disk/ice4/hakim/gitwork/LMR'
-SRC_DIR = '/Users/fzhu/Sync/Academic/Project/LMR/pyLMR'
+#  SRC_DIR = '/Users/fzhu/Sync/Academic/Project/LMR/pyLMR'
+SRC_DIR = '/home/geovault-02/fengzhu/Project/LMR/pyLMR'
 
 # Control logging output. (0 = none; 1 = most important; 2 = many; 3 = a lot;
 #   >=4 all)
