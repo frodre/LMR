@@ -83,6 +83,8 @@ def prior_assignment(iprior):
         prior_object = prior_ccsm3_trace21ka()
     elif iprior == 'cgenie_petm':
         prior_object = prior_cgenie_petm()
+    elif iprior == 'cesm_last_millennium':
+        prior_object = prior_cesm_last_millennium()
 
         
     return prior_object
@@ -543,4 +545,19 @@ class prior_cgenie_petm(prior_master):
                                                       self.avgInterval,
                                                       self.detrend,
                                                       self.anom_reference)
+        return
+
+# class for the CESM last millennium simulation
+class prior_cesm_last_millennium(prior_master):
+
+    def read_prior(self):
+
+        from load_gridded_data import read_gridded_data_CMIP5_model
+        self.prior_dict = read_gridded_data_CMIP5_model(self.prior_datadir,
+                                                        self.prior_datafile,
+                                                        self.statevars,
+                                                        self.avgInterval,
+                                                        self.detrend,
+                                                        self.anom_reference,
+                                                        self.statevars_info)
         return

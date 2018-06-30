@@ -337,3 +337,14 @@ test_20cr:
   datadir: /home/disk/p/wperkins/Research/LMR/tests/data/
   datafile: '[vardef_template]_gridded_dat.nc'
   dataformat: NCD
+
+cesm_last_millennium:
+  info:
+    multiple_vars: True
+    template: '[vardef_template]'
+    available_vars: [tas_sfc_Amon,
+                     pr_sfc_Amon]
+
+  datadir: null
+  datafile: '[vardef_template]_CESM_past1000_085001-200512.nc'
+  dataformat: NCD
