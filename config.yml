@@ -12,33 +12,34 @@ wrapper:
   multi_seed: null
 
 core:
-  nexp: test_ccsm4_nens_100_f2py_thread_16_slurm_hungus_0_2000
+  nexp: test_cesm_nens_100_f2py_thread_4_slurm_hungus_850_2005
 #  lmr_path: /home/katabatic/wperkins/data/LMR
 #  lmr_path: /home/disk/ice4/nobackup/hakim/lmr
-  # lmr_path: /Users/fzhu/GoogleDrive/Data/LMR/LMR_data
-  lmr_path: /home/geovault-02/fengzhu/Data/LMR/LMR_data_control
+  lmr_path: /Users/fzhu/GoogleDrive/Data/LMR/LMR_data
+  # lmr_path: /home/geovault-02/fengzhu/Data/LMR/LMR_data_control
 
 #  datadir_output: /home/katabatic/wperkins/data/LMR/output/working
 #  datadir_output: /home/disk/ice4/hakim/svnwork/lmr/trunk/data
-  # datadir_output: /Users/fzhu/Sync/Academic/Project/LMR/pyLMR/output
-  datadir_output: /home/geovault-02/fengzhu/Project/LMR/pyLMR/output
+  datadir_output: /Users/fzhu/Sync/Academic/Project/LMR/pyLMR/output
+  # datadir_output: /home/geovault-02/fengzhu/Project/LMR/pyLMR/output
 
 #  archive_dir: /home/katabatic2/wperkins/LMR_output/testing
 #  archive_dir: /home/disk/kalman3/hakim/LMR
-  # archive_dir: /Users/fzhu/Sync/Academic/Project/LMR/pyLMR/archive
-  archive_dir: /home/geovault-02/fengzhu/Project/LMR/pyLMR/archive
+  archive_dir: /Users/fzhu/Sync/Academic/Project/LMR/pyLMR/archive
+  # archive_dir: /home/geovault-02/fengzhu/Project/LMR/pyLMR/archive
 
   online_reconstruction: False
   clean_start: True
   use_precalc_ye: True
   write_posterior_Ye: False
-  recon_period: !!python/tuple [1, 2000]
+  # recon_period: !!python/tuple [1, 2000]
+  recon_period: !!python/tuple [850, 2005]
 #  recon_period: !!python/tuple [-120000, 2000]
   recon_timescale: 1
 #  recon_timescale: 250
   anom_reference_period: !!python/tuple [1951, 1980]
   nens: 100
-  nthread: 16  # added by fzhu
+  nthread: 4  # added by fzhu
   use_f2py: True  # added by fzhu
   seed: null
   loc_rad: null
@@ -346,7 +347,8 @@ psm:
     dataformat_BayesRegressionData: MAT
 
 prior:
-  prior_source: ccsm4_last_millenium
+  # prior_source: ccsm4_last_millenium
+  prior_source: cesm_last_millenium
  # prior_source: icesm_last_millennium
 #  prior_source: ccsm3_trace21ka
 

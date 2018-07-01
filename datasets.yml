@@ -338,7 +338,7 @@ test_20cr:
   datafile: '[vardef_template]_gridded_dat.nc'
   dataformat: NCD
 
-cesm_last_millennium:
+cesm_last_millenium:
   info:
     multiple_vars: True
     template: '[vardef_template]'

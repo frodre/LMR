@@ -15,18 +15,18 @@ core:
   nexp: test_cesm_nens_100_f2py_thread_4_slurm_hungus_850_2005
 #  lmr_path: /home/katabatic/wperkins/data/LMR
 #  lmr_path: /home/disk/ice4/nobackup/hakim/lmr
-  # lmr_path: /Users/fzhu/GoogleDrive/Data/LMR/LMR_data
-  lmr_path: /home/geovault-02/fengzhu/Data/LMR/LMR_data_control
+  lmr_path: /Users/fzhu/GoogleDrive/Data/LMR/LMR_data
+  # lmr_path: /home/geovault-02/fengzhu/Data/LMR/LMR_data_control
 
 #  datadir_output: /home/katabatic/wperkins/data/LMR/output/working
 #  datadir_output: /home/disk/ice4/hakim/svnwork/lmr/trunk/data
-  # datadir_output: /Users/fzhu/Sync/Academic/Project/LMR/pyLMR/output
-  datadir_output: /home/geovault-02/fengzhu/Project/LMR/pyLMR/output
+  datadir_output: /Users/fzhu/Sync/Academic/Project/LMR/pyLMR/output
+  # datadir_output: /home/geovault-02/fengzhu/Project/LMR/pyLMR/output
 
 #  archive_dir: /home/katabatic2/wperkins/LMR_output/testing
 #  archive_dir: /home/disk/kalman3/hakim/LMR
-  # archive_dir: /Users/fzhu/Sync/Academic/Project/LMR/pyLMR/archive
-  archive_dir: /home/geovault-02/fengzhu/Project/LMR/pyLMR/archive
+  archive_dir: /Users/fzhu/Sync/Academic/Project/LMR/pyLMR/archive
+  # archive_dir: /home/geovault-02/fengzhu/Project/LMR/pyLMR/archive
 
   online_reconstruction: False
   clean_start: True
