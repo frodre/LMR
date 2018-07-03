@@ -348,3 +348,13 @@ cesm_last_millenium:
   datadir: null
   datafile: '[vardef_template]_CESM_past1000_085001-200512.nc'
   dataformat: NCD
+
+cesm_850_2100:
+  info:
+    multiple_vars: True
+    template: '[vardef_template]'
+    available_vars: [tas_sfc_Amon]
+
+  datadir: null
+  datafile: '[vardef_template]_CESM_past1000_085001-210012.nc'
+  dataformat: NCD

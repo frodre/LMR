@@ -493,14 +493,10 @@ def LMR_driver_callable(cfg=None):
     # TODO: AP temporary fix for no TAS in state
     tas_var = [item for item in cfg.prior.state_variables.keys() if 'tas_sfc_' in item]
     if tas_var:
-        gmt_save = np.zeros([assim_proxy_count+1,ntimes])
-        nhmt_save = np.zeros([assim_proxy_count+1,ntimes])
-        shmt_save = np.zeros([assim_proxy_count+1,ntimes])
         # get state vector indices where to find surface air temperature
         ibeg_tas = X.trunc_state_info[tas_var[0]]['pos'][0]
         iend_tas = X.trunc_state_info[tas_var[0]]['pos'][1]
         xbm = np.mean(Xb_one[ibeg_tas:iend_tas+1, :], axis=1)  # ensemble-mean
-
         nlat_new = X.trunc_state_info[tas_var[0]]['spacedims'][0]
         nlon_new = X.trunc_state_info[tas_var[0]]['spacedims'][1]
         xbm_lalo = xbm.reshape(nlat_new, nlon_new)
@@ -508,6 +504,10 @@ def LMR_driver_callable(cfg=None):
         lat_lalo = lat_coords.reshape(nlat_new, nlon_new)
 
         [gmt,nhmt,shmt] = LMR_utils.global_hemispheric_means(xbm_lalo, lat_lalo[:, 0])
+
+        gmt_save = np.zeros([assim_proxy_count+1,ntimes])
+        nhmt_save = np.zeros([assim_proxy_count+1,ntimes])
+        shmt_save = np.zeros([assim_proxy_count+1,ntimes])
 
         # First row is prior GMT
         gmt_save[0, :] = gmt
@@ -662,25 +662,35 @@ def LMR_driver_callable(cfg=None):
         except AttributeError as e:
             np.save(filen, Xb)
 
-    loop_begin_time = time()  # added by fzhu
+        return gmt_save[:, yr_idx], nhmt_save[:, yr_idx], shmt_save[:, yr_idx]
+
+
+    #==================================================================================
+    # added by fzhu below
+    #----------------------------------------------------------------------------------
+    loop_begin_time = time()
     recon_years = range(recon_period[0], recon_period[1]+1, recon_timescale)
 
     if nthread == 1:
-        for yr_idx, t in enumerate(range(recon_period[0], recon_period[1]+1, recon_timescale)):
+        for yr_idx, t in enumerate(recon_years):
             loop_over_year(yr_idx, t)
+
     elif nthread > 1:
         with Pool(nthread) as pool:
-            pool.map(loop_over_year, range(np.size(recon_years)), recon_years)
+            res = pool.map(loop_over_year, range(np.size(recon_years)), recon_years)
+            res_array = np.asarray(res)
+            gmt_save = res_array[:, 0, :].T
+            nhmt_save = res_array[:, 1, :].T
+            shmt_save = res_array[:, 1, :].T
     else:
         print('ERROR: Wrong nthread value!!!')
         raise SystemExit(1)
 
-    loop_end_time = time()  # added by fzhu
+    loop_end_time = time()
     print('=====================================================')
     print('DA total time: ' + str((loop_end_time-loop_begin_time)/60.0) + ' mins')
     print('=====================================================')
-
-
+    #==================================================================================
 
     end_time = time() - begin_time
 

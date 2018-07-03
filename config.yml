@@ -12,34 +12,35 @@ wrapper:
   multi_seed: null
 
 core:
-  nexp: test_cesm_nens_100_f2py_thread_4_slurm_hungus_850_2005
+  # nexp: test_cesm_nens_10_f2py_thread_1_slurm_hungus_850_859
+  nexp: test_ccsm_nens_10_f2py_thread_1_slurm_hungus_850_859
 #  lmr_path: /home/katabatic/wperkins/data/LMR
 #  lmr_path: /home/disk/ice4/nobackup/hakim/lmr
-  lmr_path: /Users/fzhu/GoogleDrive/Data/LMR/LMR_data
-  # lmr_path: /home/geovault-02/fengzhu/Data/LMR/LMR_data_control
+  # lmr_path: /Users/fzhu/GoogleDrive/Data/LMR/LMR_data
+  lmr_path: /home/geovault-02/fengzhu/Data/LMR/LMR_data_control
 
 #  datadir_output: /home/katabatic/wperkins/data/LMR/output/working
 #  datadir_output: /home/disk/ice4/hakim/svnwork/lmr/trunk/data
-  datadir_output: /Users/fzhu/Sync/Academic/Project/LMR/pyLMR/output
-  # datadir_output: /home/geovault-02/fengzhu/Project/LMR/pyLMR/output
+  # datadir_output: /Users/fzhu/Sync/Academic/Project/LMR/pyLMR/output
+  datadir_output: /home/geovault-02/fengzhu/Project/LMR/pyLMR/output
 
 #  archive_dir: /home/katabatic2/wperkins/LMR_output/testing
 #  archive_dir: /home/disk/kalman3/hakim/LMR
-  archive_dir: /Users/fzhu/Sync/Academic/Project/LMR/pyLMR/archive
-  # archive_dir: /home/geovault-02/fengzhu/Project/LMR/pyLMR/archive
+  # archive_dir: /Users/fzhu/Sync/Academic/Project/LMR/pyLMR/archive
+  archive_dir: /home/geovault-02/fengzhu/Project/LMR/pyLMR/archive
 
   online_reconstruction: False
   clean_start: True
   use_precalc_ye: True
   write_posterior_Ye: False
   # recon_period: !!python/tuple [1, 2000]
-  recon_period: !!python/tuple [850, 2005]
+  recon_period: !!python/tuple [850, 859]
 #  recon_period: !!python/tuple [-120000, 2000]
   recon_timescale: 1
 #  recon_timescale: 250
   anom_reference_period: !!python/tuple [1951, 1980]
-  nens: 100
-  nthread: 4  # added by fzhu
+  nens: 10
+  nthread: 1  # added by fzhu
   use_f2py: True  # added by fzhu
   seed: null
   loc_rad: null
@@ -174,24 +175,24 @@ proxies:
       'Bivalve_d18O'
       ]
     proxy_psm_type:
-      Corals and Sclerosponges_d18O:  bilinear
-      Corals and Sclerosponges_SrCa:  bilinear
-      Corals and Sclerosponges_Rates: bilinear
-      Ice Cores_d18O:                 bilinear
-      Ice Cores_dD:                   bilinear
-      Ice Cores_Accumulation:         bilinear
-      Ice Cores_MeltFeature:          bilinear
-      Lake Cores_Varve:               bilinear
-      Lake Cores_BioMarkers:          bilinear
-      Lake Cores_GeoChem:             bilinear
-      Lake Cores_Misc:                bilinear
-      Marine Cores_d18O:              bilinear
-      Tree Rings_WidthPages2:         bilinear
-      Tree Rings_WidthBreit:          bilinear
-      Tree Rings_WoodDensity:         bilinear
-      Tree Rings_Isotopes:            bilinear
-      Speleothems_d18O:               bilinear
-      Bivalve_d18O:                   bilinear
+      Corals and Sclerosponges_d18O:  linear
+      Corals and Sclerosponges_SrCa:  linear
+      Corals and Sclerosponges_Rates: linear
+      Ice Cores_d18O:                 linear
+      Ice Cores_dD:                   linear
+      Ice Cores_Accumulation:         linear
+      Ice Cores_MeltFeature:          linear
+      Lake Cores_Varve:               linear
+      Lake Cores_BioMarkers:          linear
+      Lake Cores_GeoChem:             linear
+      Lake Cores_Misc:                linear
+      Marine Cores_d18O:              linear
+      Tree Rings_WidthPages2:         linear
+      Tree Rings_WidthBreit:          linear
+      Tree Rings_WoodDensity:         linear
+      Tree Rings_Isotopes:            linear
+      Speleothems_d18O:               linear
+      Bivalve_d18O:                   linear
     proxy_assim2:
       Corals and Sclerosponges_d18O: [
         'd18O',
@@ -347,14 +348,15 @@ psm:
     dataformat_BayesRegressionData: MAT
 
 prior:
-  # prior_source: ccsm4_last_millenium
-  prior_source: cesm_last_millenium
+  prior_source: ccsm4_last_millenium
+  # prior_source: cesm_last_millenium
+  # prior_source: cesm_850_2100
  # prior_source: icesm_last_millennium
 #  prior_source: ccsm3_trace21ka
 
   state_variables:
     tas_sfc_Amon: anom
-    pr_sfc_Amon: anom
+    # pr_sfc_Amon: anom
 #    scpdsi_sfc_Amon: anom
 #    psl_sfc_Amon: anom
 #    zg_500hPa_Amon: anom
