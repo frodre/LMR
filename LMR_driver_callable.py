@@ -77,7 +77,12 @@ from LMR_utils import FlagError
 
 # added by fzhu below
 from pathos.multiprocessing import ProcessingPool as Pool
-import f2py_enkf as f2py
+try:
+    import f2py_enkf as f2py
+    f2py_imported = True
+except ImportError:
+    print('WARNING: f2py_enkf not imported...')
+    f2py_imported = False
 #  import sys
 
 def LMR_driver_callable(cfg=None):
@@ -615,7 +620,7 @@ def LMR_driver_callable(cfg=None):
             #      print('=== Error ===> f2py version got different result!')
             #      sys.exit()
 
-            if core.use_f2py:
+            if core.use_f2py and f2py_imported:
                 # f2py version by fzhu
                 Nx, Nens = np.shape(Xb)
                 Xa = f2py.f2py_enkf.enkf_update_array(Xb, Yobs, Ye, ob_err, inflate, Nx, Nens)
