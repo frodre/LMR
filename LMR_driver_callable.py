@@ -75,15 +75,7 @@ import LMR_config as BaseCfg
 from LMR_DA import enkf_update_array, cov_localization
 from LMR_utils import FlagError
 
-# added by fzhu below
-from pathos.multiprocessing import ProcessingPool as Pool
-try:
-    import f2py_enkf as f2py
-    f2py_imported = True
-except ImportError:
-    print('WARNING: f2py_enkf not imported...')
-    f2py_imported = False
-#  import sys
+from pathos.multiprocessing import ProcessingPool as Pool  # added by fzhu
 
 def LMR_driver_callable(cfg=None):
 
@@ -179,7 +171,8 @@ def LMR_driver_callable(cfg=None):
 
     # check covariance inflation from config
     #  inflate = None
-    inflate = 1  # modified by fzhu
+
+    inflate = 1 # modified by fzhu
 
     if inflation_fact is not None:
         inflate = inflation_fact
@@ -607,25 +600,7 @@ def LMR_driver_callable(cfg=None):
                        str(Yobs) + ' (nobs=' + str(nYobs) +') | mean prior proxy estimate: ' +
                        str(Ye.mean())))
 
-            #  #  Update the state
-            #  Xa = enkf_update_array(Xb, Yobs, Ye, ob_err, loc, inflate)
-
-            #  # f2py version by fzhu
-            #  Nx, Nens = np.shape(Xb)
-            #  Xa_f2py = f2py.f2py_enkf.enkf_update_array(Xb, Yobs, Ye, ob_err, inflate, Nx, Nens)
-
-            #  if np.max(np.abs(Xa-Xa_f2py)) <= 1e-4:
-            #      print('=== YES ===> f2py version got the same result!')
-            #  else:
-            #      print('=== Error ===> f2py version got different result!')
-            #      sys.exit()
-
-            if core.use_f2py and f2py_imported:
-                # f2py version by fzhu
-                Nx, Nens = np.shape(Xb)
-                Xa = f2py.f2py_enkf.enkf_update_array(Xb, Yobs, Ye, ob_err, inflate, Nx, Nens)
-            else:
-                Xa = enkf_update_array(Xb, Yobs, Ye, ob_err, loc, inflate)
+            Xa = enkf_update_array(Xb, Yobs, Ye, ob_err, loc, inflate)
 
             # TODO: AP Temporary fix for no TAS in state
             if tas_var:

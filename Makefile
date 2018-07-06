@@ -22,6 +22,24 @@ cesm_linear_0-2000_n16_nof2py:
 cesm_bilinear_850-1000_n1_nof2py:
 	slmr -c config_cesm_bilinear.yml -n 1 -nn gold -rp 850 1000 -em slmr.slurm@gmail.com -x test_cesm_bilinear_850-1000_n1_nof2py
 
+cesm_bilinear_850-1000_n1_f2py:
+	slmr -c config_cesm_bilinear.yml -n 1 -nn gold -rp 850 1000 -em slmr.slurm@gmail.com -x test_cesm_bilinear_850-1000_n1_f2py -f
+
+cesm_bilinear_850-1000_n2_nof2py:
+	slmr -c config_cesm_bilinear.yml -n 2 -nn gold -rp 850 1000 -em slmr.slurm@gmail.com -x test_cesm_bilinear_850-1000_n2_nof2py
+
+cesm_bilinear_850-1000_n2_f2py:
+	slmr -c config_cesm_bilinear.yml -n 2 -nn gold -rp 850 1000 -em slmr.slurm@gmail.com -x test_cesm_bilinear_850-1000_n2_f2py -f
+
+cesm_bilinear_850-1000_n4_nof2py:
+	slmr -c config_cesm_bilinear.yml -n 4 -nn gold -rp 850 1000 -em slmr.slurm@gmail.com -x test_cesm_bilinear_850-1000_n4_nof2py
+
+cesm_bilinear_850-1000_n4_f2py:
+	slmr -c config_cesm_bilinear.yml -n 4 -nn gold -rp 850 1000 -em slmr.slurm@gmail.com -x test_cesm_bilinear_850-1000_n4_f2py -f
+
+cesm_bilinear_850-1000_n8_nof2py:
+	slmr -c config_cesm_bilinear.yml -n 8 -nn gold -rp 850 1000 -em slmr.slurm@gmail.com -x test_cesm_bilinear_850-1000_n8_nof2py
+
 cesm_bilinear_850-1000_n8_f2py:
 	slmr -c config_cesm_bilinear.yml -n 8 -nn gold -rp 850 1000 -em slmr.slurm@gmail.com -x test_cesm_bilinear_850-1000_n8_f2py -f
 
