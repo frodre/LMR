@@ -1862,8 +1862,16 @@ def create_precalc_ye_filename(config,psm_key,prior_kind):
         calib_avgPeriod = ''.join([str(config.prior.avgInterval['multiyear'][0]),'yrs'])
         calib_str = ''
         state_vars_for_ye = config.psm.bayesreg_d18o.psm_required_variables
+
+    elif psm_key in ['bayesreg_mgca_pachyderma_red', 'bayesreg_mgca_pachyderma_bcp',
+                     'bayesreg_mgca_bulloides_red', 'bayesreg_mgca_bulloides_bcp',
+                     'bayesreg_mgca_sacculifer_red', 'bayesreg_mgca_sacculifer_bcp',
+                     'bayesreg_mgca_ruberwhite_red', 'bayesreg_mgca_ruberwhite_bcp']:
+        calib_avgPeriod = ''.join([str(config.prior.avgInterval['multiyear'][0]), 'yrs'])
+        calib_str = ''
+        state_vars_for_ye = config.psm.bayesreg_mgca.psm_required_variables
     else:
-        raise ValueError('Unrecognized PSM key.')
+        raise ValueError('Unrecognized PSM key: {}'.format(psm_key))
     
     if calib_avgPeriod:
         psm_str = psm_key +'_'+ calib_avgPeriod + '-' + calib_str
@@ -1941,8 +1949,13 @@ def load_precalculated_ye_vals_psm_per_proxy(config, proxy_manager, proxy_set, s
             pkind = 'full'
         elif psm_key == 'bayesreg_d18o_pachyderma':
             pkind = 'full'
+        elif psm_key in ['bayesreg_mgca_pachyderma_red', 'bayesreg_mgca_pachyderma_bcp',
+                         'bayesreg_mgca_bulloides_red', 'bayesreg_mgca_bulloides_bcp',
+                         'bayesreg_mgca_sacculifer_red', 'bayesreg_mgca_sacculifer_bcp',
+                         'bayesreg_mgca_ruberwhite_red', 'bayesreg_mgca_ruberwhite_bcp']:
+            pkind = 'full'
         else:
-            raise ValueError('Unrecognized PSM key.')
+            raise ValueError('Unrecognized PSM key: {}'.format(psm_key))
 
         load_fname = create_precalc_ye_filename(config,psm_key,pkind)
         _log.info('Loading file:' + load_fname)
@@ -2061,7 +2074,7 @@ def load_precalculated_ye_vals_psm_per_proxy_onlyobjs(config, proxy_objs, sample
         elif psm_key == 'bayesreg_uk37':
             pkind = 'full'
         else:
-            raise ValueError('Unrecognized PSM key.')
+            raise ValueError('Unrecognized PSM key: {}'.format(psm_key))
 
         load_fname = create_precalc_ye_filename(config,psm_key,pkind)
         print('  Loading file:', load_fname)

@@ -66,7 +66,11 @@ try:
     import deltaoxfox as dfox
 except ImportError as e3:
     print('Warning:', e3)
-    
+try:
+    import baymag
+except ImportError as e3:
+    print('Warning:', e3)
+
 
 # Logging output utility, configuration controlled by driver
 _log = logging.getLogger(__name__)
@@ -2009,6 +2013,185 @@ class BayesRegD18oPachydermaPSM(BayesRegD18oPSM):
         self.psm_key = 'bayesreg_d18o_pachyderma'
 
 
+@class_docs_fixer
+class BayesRegMgcaPSM(BayesRegPSM):
+    """
+    ...
+
+    Attributes
+    ----------
+
+    ...
+
+    lat: float
+        Latitude of associated proxy site
+    lon: float
+        Longitude of associated proxy site
+    elev: float
+        Elevation/depth of proxy site
+    R: float
+        Obs. error variance associated to proxy site
+
+    Parameters
+    ----------
+    config: LMR_config
+        Configuration module used for current LMR run.
+    proxy_obj: BaseProxyObject like
+        Proxy object that this PSM is being attached to.
+
+    Raises
+    ------
+    ValueError
+        ...
+    """
+
+    def __init__(self, config, proxy_obj, spp, cleaning):
+        super().__init__(config, proxy_obj)
+        self.psm_key = 'bayesreg_mgca'
+        self.sensitivity = 'sst'  # TODO(brews): Also need 'sss'?
+        self.psm_required_variables = config.psm.bayesreg_mgca.psm_required_variables
+        self.spp = str(spp)
+        self.cleaning = np.array(cleaning)
+
+        self.R = self._estimate_r(15, 16)  # This is temporary. Should consider wider range.
+
+    def _estimate_r(self, *args, **kwargs):
+        """Fit Bayes regression to range of input values and return max variance
+        """
+        xrange = np.arange(*args, **kwargs)
+
+        # This assumes that changes in salinity will not influence ensemble variance.
+        ensemble = self._mcmc_predict(sst=xrange)
+        return np.max(np.var(ensemble, axis=1))
+
+    def _mcmc_predict(self, sst):
+        """Get MCMC ensemble prediction for input variables
+        """
+        # Longitude is often over 180.
+        lon = float(self.lon)
+        if lon > 180:
+            lon -= 360
+
+        depth = np.abs(self.elev)  # `baymag` wants depth needs to be positive.
+
+        y = baymag.predict_mgca(seatemp=sst, spp=self.spp, latlon=(self.lat, lon),
+                                depth=depth, cleaning=self.cleaning,
+                                distance_threshold=30000)
+
+        return y.ensemble
+
+    def psm(self, Xb, X_state_info, X_coords):
+        """
+        Maps a given state to observations for the given proxy
+
+        Parameters
+        ----------
+        Xb: ndarray
+            State vector to be mapped into observation space (stateDim x ensDim)
+        X_state_info: dict
+            Information pertaining to variables in the state vector
+        X_coords: ndarray
+            Coordinates for the state vector (stateDim x 2)
+
+        Returns
+        -------
+        Ye:
+            Equivalent observation from prior
+        """
+
+        # ----------------------
+        # Calculate the Ye's ...
+        # ----------------------
+
+        # Defining state variables to consider in the calculation of Ye's
+        #
+        for state_var in list(self.psm_required_variables.keys()):
+            if state_var not in list(X_state_info.keys()):
+                raise KeyError('Needed variable not in state vector for Ye calculation.')
+
+        xb_sst = self._get_gridpoint_data('tos_sfc_Odec', Xb, X_state_info, X_coords)
+
+        # check if gridpoint_data is in K: need deg. C for forward model
+        # crude check...
+        if np.nanmin(xb_sst) > 200.0:
+            xb_sst = xb_sst - 273.15
+
+        ye_ens = self._mcmc_predict(xb_sst)
+        ye = np.mean(ye_ens, axis=1)
+        return ye
+
+    # Define a default error model for this proxy
+    @staticmethod
+    def error():
+        return 0.1
+
+# Define specific classes 'foram type':'sample cleaning' combinations for Mg/Ca proxies.
+# Might do better as a class factory in the future.
+
+@class_docs_fixer
+class BayesRegMgcaRuberwhiteRedPSM(BayesRegMgcaPSM):
+    def __init__(self, config, proxy_obj):
+        # Mg/Ca for ruber white with fully reductive sample cleaning
+        super().__init__(config, proxy_obj, 'ruber_w', cleaning=1)
+        self.psm_key = 'bayesreg_mgca_ruberwhite_red'
+
+
+@class_docs_fixer
+class BayesRegMgcaRuberwhiteBcpPSM(BayesRegMgcaPSM):
+    def __init__(self, config, proxy_obj):
+        # Mg/Ca for ruber white with Barker sample cleaning protocol
+        super().__init__(config, proxy_obj, 'ruber_w', cleaning=0)
+        self.psm_key = 'bayesreg_mgca_ruberwhite_bcp'
+
+
+@class_docs_fixer
+class BayesRegMgcaSacculiferRedPSM(BayesRegMgcaPSM):
+    def __init__(self, config, proxy_obj):
+        # Mg/Ca for sacculifer with fully reductive sample cleaning
+        super().__init__(config, proxy_obj, 'sacculifer', cleaning=1)
+        self.psm_key = 'bayesreg_mgca_sacculifer_red'
+
+
+@class_docs_fixer
+class BayesRegMgcaSacculiferBcpPSM(BayesRegMgcaPSM):
+    def __init__(self, config, proxy_obj):
+        # Mg/Ca for sacculifer with Barker sample cleaning protocol
+        super().__init__(config, proxy_obj, 'sacculifer', cleaning=0)
+        self.psm_key = 'bayesreg_mgca_sacculifer_bcp'
+
+
+@class_docs_fixer
+class BayesRegMgcaBulloidesRedPSM(BayesRegMgcaPSM):
+    def __init__(self, config, proxy_obj):
+        # Mg/Ca for bulloides with fully reductive sample cleaning
+        super().__init__(config, proxy_obj, 'bulloides', cleaning=1)
+        self.psm_key = 'bayesreg_mgca_bulloides_red'
+
+
+@class_docs_fixer
+class BayesRegMgcaBulloidesBcpPSM(BayesRegMgcaPSM):
+    def __init__(self, config, proxy_obj):
+        # Mg/Ca for bulloides with Barker sample cleaning protocol
+        super().__init__(config, proxy_obj, 'bulloides', cleaning=0)
+        self.psm_key = 'bayesreg_mgca_bulloides_bcp'
+
+
+@class_docs_fixer
+class BayesRegMgcaPachydermaRedPSM(BayesRegMgcaPSM):
+    def __init__(self, config, proxy_obj):
+        # Mg/Ca for pachyderma sinistral with fully reductive sample cleaning
+        super().__init__(config, proxy_obj, 'pachy_s', cleaning=1)
+        self.psm_key = 'bayesreg_mgca_pachyderma_red'
+
+
+@class_docs_fixer
+class BayesRegMgcaPachydermaBcpPSM(BayesRegMgcaPSM):
+    def __init__(self, config, proxy_obj):
+        # Mg/Ca for pachyderma sinistral with Barker sample cleaning protocol
+        super().__init__(config, proxy_obj, 'pachy_s', cleaning=0)
+        self.psm_key = 'bayesreg_mgca_pachyderma_bcp'
+
+
 # Mapping dict to PSM object type, this is where proxy_type/psm relations
 # should be specified (I think.) - AP
 _psm_classes = {'linear': LinearPSM, 'linear_TorP': LinearPSM_TorP,
@@ -2017,7 +2200,16 @@ _psm_classes = {'linear': LinearPSM, 'linear_TorP': LinearPSM_TorP,
                 'bayesreg_d18o_pachyderma': BayesRegD18oPachydermaPSM,
                 'bayesreg_d18o_bulloides': BayesRegD18oBulloidesPSM,
                 'bayesreg_d18o_sacculifer': BayesRegD18oSacculiferPSM,
-                'bayesreg_d18o_ruberwhite': BayesRegD18oRuberwhitePSM}
+                'bayesreg_d18o_ruberwhite': BayesRegD18oRuberwhitePSM,
+                'bayesreg_mgca_ruberwhite_red': BayesRegMgcaRuberwhiteRedPSM,
+                'bayesreg_mgca_ruberwhite_bcp': BayesRegMgcaRuberwhiteBcpPSM,
+                'bayesreg_mgca_sacculifer_red': BayesRegMgcaSacculiferRedPSM,
+                'bayesreg_mgca_sacculifer_bcp': BayesRegMgcaSacculiferBcpPSM,
+                'bayesreg_mgca_bulloides_red': BayesRegMgcaBulloidesRedPSM,
+                'bayesreg_mgca_bulloides_bcp': BayesRegMgcaBulloidesBcpPSM,
+                'bayesreg_mgca_pachyderma_red': BayesRegMgcaPachydermaRedPSM,
+                'bayesreg_mgca_pachyderma_bcp': BayesRegMgcaPachydermaBcpPSM,
+                }
 
 
 def get_psm_class(psm_type):

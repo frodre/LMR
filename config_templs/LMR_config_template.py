@@ -1545,6 +1545,15 @@ class psm(ConfigGroup):
         self.bayesreg_d18o_ruberwhite = self.bayesreg_d18o
         self.bayesreg_d18o_bulloides = self.bayesreg_d18o
         self.bayesreg_d18o_pachyderma = self.bayesreg_d18o
+        self.bayesreg_mgca = self.bayesreg_mgca(**kwargs.pop('bayesreg_mgca', {}))
+        self.bayesreg_mgca_sacculifer_red = self.bayesreg_mgca
+        self.bayesreg_mgca_sacculifer_bcp = self.bayesreg_mgca
+        self.bayesreg_mgca_ruberwhite_red = self.bayesreg_mgca
+        self.bayesreg_mgca_ruberwhite_bcp = self.bayesreg_mgca
+        self.bayesreg_mgca_bulloides_red = self.bayesreg_mgca
+        self.bayesreg_mgca_bulloides_bcp = self.bayesreg_mgca
+        self.bayesreg_mgca_pachyderma_red = self.bayesreg_mgca
+        self.bayesreg_mgca_pachyderma_bcp = self.bayesreg_mgca
 
 
         super().__init__(**kwargs)

@@ -200,6 +200,12 @@ def main(cfgin=None, config_path=None):
         elif psm_key == 'bayesreg_d18o_ruberwhite':
             statevars = cfg.psm.bayesreg_d18o.psm_required_variables
             psm_avg = 'multiyear'
+        elif psm_key in ['bayesreg_mgca_pachyderma_red', 'bayesreg_mgca_pachyderma_bcp',
+                         'bayesreg_mgca_bulloides_red', 'bayesreg_mgca_bulloides_bcp',
+                         'bayesreg_mgca_sacculifer_red', 'bayesreg_mgca_sacculifer_bcp',
+                         'bayesreg_mgca_ruberwhite_red', 'bayesreg_mgca_ruberwhite_bcp']:
+            statevars = cfg.psm.bayesreg_mgca.psm_required_variables
+            psm_avg = 'multiyear'
         else:
             raise SystemExit
 
