@@ -203,7 +203,8 @@ def main(cfgin=None, config_path=None):
         elif psm_key in ['bayesreg_mgca_pachyderma_red', 'bayesreg_mgca_pachyderma_bcp',
                          'bayesreg_mgca_bulloides_red', 'bayesreg_mgca_bulloides_bcp',
                          'bayesreg_mgca_sacculifer_red', 'bayesreg_mgca_sacculifer_bcp',
-                         'bayesreg_mgca_ruberwhite_red', 'bayesreg_mgca_ruberwhite_bcp']:
+                         'bayesreg_mgca_ruberwhite_red', 'bayesreg_mgca_ruberwhite_bcp',
+                         'bayesreg_mgca_pooled_red', 'bayesreg_mgca_pooled_bcp']:
             statevars = cfg.psm.bayesreg_mgca.psm_required_variables
             psm_avg = 'multiyear'
         else:

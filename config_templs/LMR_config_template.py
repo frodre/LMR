@@ -1554,6 +1554,8 @@ class psm(ConfigGroup):
         self.bayesreg_mgca_bulloides_bcp = self.bayesreg_mgca
         self.bayesreg_mgca_pachyderma_red = self.bayesreg_mgca
         self.bayesreg_mgca_pachyderma_bcp = self.bayesreg_mgca
+        self.bayesreg_mgca_pooled_red = self.bayesreg_mgca
+        self.bayesreg_mgca_pooled_bcp = self.bayesreg_mgca
 
 
         super().__init__(**kwargs)

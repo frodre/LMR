@@ -2045,12 +2045,12 @@ class BayesRegMgcaPSM(BayesRegPSM):
         ...
     """
 
-    def __init__(self, config, proxy_obj, spp, cleaning):
+    def __init__(self, config, proxy_obj, cleaning, spp=None):
         super().__init__(config, proxy_obj)
         self.psm_key = 'bayesreg_mgca'
         self.sensitivity = 'sst'  # TODO(brews): Also need 'sss'?
         self.psm_required_variables = config.psm.bayesreg_mgca.psm_required_variables
-        self.spp = str(spp)
+        self.spp = spp
         self.cleaning = np.array(cleaning)
 
         self.R = self._estimate_r(15, 16)  # This is temporary. Should consider wider range.
@@ -2072,11 +2072,11 @@ class BayesRegMgcaPSM(BayesRegPSM):
         if lon > 180:
             lon -= 360
 
-        depth = np.abs(self.elev)  # `baymag` wants depth needs to be positive.
+        depth = np.abs(self.elev)  # `baymag` wants positive depths.
 
         y = baymag.predict_mgca(seatemp=sst, spp=self.spp, latlon=(self.lat, lon),
                                 depth=depth, cleaning=self.cleaning,
-                                distance_threshold=30000)
+                                distance_threshold=3000)
 
         return y.ensemble
 
@@ -2127,6 +2127,22 @@ class BayesRegMgcaPSM(BayesRegPSM):
 
 # Define specific classes 'foram type':'sample cleaning' combinations for Mg/Ca proxies.
 # Might do better as a class factory in the future.
+
+@class_docs_fixer
+class BayesRegMgcaPooledRedPSM(BayesRegMgcaPSM):
+    def __init__(self, config, proxy_obj):
+        # Mg/Ca for model with pooled foram species with fully reductive sample cleaning
+        super().__init__(config, proxy_obj, cleaning=1, spp=None)
+        self.psm_key = 'bayesreg_mgca_pooled_red'
+
+
+@class_docs_fixer
+class BayesRegMgcaPooledBcpPSM(BayesRegMgcaPSM):
+    def __init__(self, config, proxy_obj):
+        # Mg/Ca for model with pooled foram species with Barker sample cleaning protocol
+        super().__init__(config, proxy_obj, cleaning=1, spp=None)
+        self.psm_key = 'bayesreg_mgca_pooled_bcp'
+
 
 @class_docs_fixer
 class BayesRegMgcaRuberwhiteRedPSM(BayesRegMgcaPSM):
@@ -2209,6 +2225,8 @@ _psm_classes = {'linear': LinearPSM, 'linear_TorP': LinearPSM_TorP,
                 'bayesreg_mgca_bulloides_bcp': BayesRegMgcaBulloidesBcpPSM,
                 'bayesreg_mgca_pachyderma_red': BayesRegMgcaPachydermaRedPSM,
                 'bayesreg_mgca_pachyderma_bcp': BayesRegMgcaPachydermaBcpPSM,
+                'bayesreg_mgca_pooled_red' : BayesRegMgcaPooledRedPSM,
+                'bayesreg_mgca_pooled_bcp' : BayesRegMgcaPooledBcpPSM,
                 }
 
 
