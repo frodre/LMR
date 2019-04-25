@@ -1973,16 +1973,22 @@ def merge_dicts_to_dataframes(proxy_def, ncdc_dict, pages2kv2_dict, meta_outfile
 
         # numpy array containing names of proxy records to eliminate
         toflush = dupes['Record_To_Eliminate'].values
+        tokeep = dupes['Corresponding_Record_To_Keep'].values
 
         for siteID in list(merged_dict.keys()):
             if siteID in toflush:
-                try:
-                    del merged_dict[siteID]
-                    print(' -- deleting: %s' % siteID)
-                    dupecount += 1
-                except KeyError:
-                    print(' -- not found: %s' % siteID)
-                    pass
+                idx = list(toflush).index(siteID)
+                sub_siteID = tokeep[idx]
+                if sub_siteID in list(merged_dict.keys()):
+                    # delete record only when the substitute is loaded
+                    try:
+                        del merged_dict[siteID]
+                        #  print(' -- deleting: %s' % siteID)
+                        print(f' -- deleting: {siteID}, using: {sub_siteID}')
+                        dupecount += 1
+                    except KeyError:
+                        print(' -- not found: %s' % siteID)
+                        pass
 
     print(' ')
     print('----------------------------------------------------------------------')
